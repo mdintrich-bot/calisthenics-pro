@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CALISTHENICS PRO — Street Workout & Skills Tracker</title>
+  <title>CALISTHENICS PRO — Street Workout & Cloud Sync</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -41,17 +41,17 @@
           <i data-lucide="Flame" class="w-6 h-6 text-white"></i>
         </div>
         <div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             <h1 class="text-lg font-extrabold tracking-tight text-white">CALISTHENICS <span class="text-orange-500">PRO</span></h1>
-            <span id="saveIndicatorBadge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-              ✓ Sauvegarde Auto Active
+            <span id="saveIndicatorBadge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">
+              Connexion base de données...
             </span>
           </div>
-          <p class="text-xs text-slate-400">Routine, Surcharge Progressive, Figures & Max Hors Routine</p>
+          <p class="text-xs text-slate-400">Synchronisation Temps Réel PC & Téléphone</p>
         </div>
       </div>
 
-      <!-- Dual Timer + Sync Button -->
+      <!-- Dual Timer + Cloud Settings Button -->
       <div class="flex items-center gap-2.5 flex-wrap">
         <!-- Timer -->
         <div class="flex items-center gap-1.5 bg-bgCard border border-borderDark rounded-xl px-3 py-1.5">
@@ -74,11 +74,11 @@
           </button>
         </div>
 
-        <!-- Sync PC / Phone Modal Button -->
+        <!-- Cloud Config Button -->
         <button onclick="openSyncModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-bgCard hover:bg-bgCardHover border border-borderDark transition text-xs font-bold text-white">
-          <span id="cloudStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-          <i data-lucide="Smartphone" class="w-4 h-4 text-sky-400"></i>
-          <span>Sync PC ↔ Tel</span>
+          <span id="cloudStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+          <i data-lucide="Database" class="w-4 h-4 text-sky-400"></i>
+          <span id="cloudBtnLabel">Base Cloud</span>
         </button>
       </div>
     </div>
@@ -158,7 +158,7 @@
             </button>
           </div>
 
-          <!-- Routine Selector Bar (Shown on Tab 1 & Tab 2) -->
+          <!-- Routine Selector Bar -->
           <div id="routineSelectorBar" class="p-4 bg-slate-900/30 border-b border-borderDark flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2 flex-1 min-w-[200px]">
               <label class="text-xs font-semibold text-slate-400 uppercase whitespace-nowrap">Routine :</label>
@@ -166,7 +166,7 @@
               </select>
             </div>
             <div class="flex items-center gap-2">
-              <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700" title="Augmente automatiquement l'objectif (+1 rep) quand 100% des séries sont validées">
+              <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
                 <input type="checkbox" id="autoLevelUpToggle" onchange="toggleAutoLevelUp(this.checked)" class="accent-orange-500 rounded" />
                 <span>Auto Level-Up (+1 rep)</span>
               </label>
@@ -185,7 +185,7 @@
             <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/50 border border-borderDark rounded-xl p-3.5">
               <div>
                 <h2 class="text-sm font-bold text-white">Feuille de Séance : Objectif vs Répétitions Réussies</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Tout ce que tu modifies ici est sauvegardé automatiquement.</p>
+                <p class="text-xs text-slate-400 mt-0.5">Synchronisation automatique entre ton PC et ton téléphone.</p>
               </div>
               <div class="flex items-center gap-2">
                 <input type="date" id="sessionDateInput" class="bg-bgMain border border-borderDark rounded-xl px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:border-orange-500" />
@@ -220,7 +220,7 @@
             </div>
           </div>
 
-          <!-- TAB 2: ROUTINE BUILDER (WITH DROPDOWN EXERCISE LIST) -->
+          <!-- TAB 2: ROUTINE BUILDER -->
           <div id="viewRoutineBuilder" class="p-5 space-y-5 hidden">
             <div class="bg-bgMain border border-borderDark rounded-xl p-4 space-y-3">
               <h3 class="text-xs font-bold uppercase tracking-wider text-orange-400">Ajouter un exercice à la routine</h3>
@@ -252,7 +252,6 @@
               </div>
             </div>
 
-            <!-- Exercises inside Active Routine -->
             <div class="space-y-2.5" id="builderExercisesList"></div>
           </div>
 
@@ -261,7 +260,7 @@
             <div class="bg-purple-500/10 border border-purple-500/25 rounded-xl p-3.5 flex items-start gap-3">
               <i data-lucide="Zap" class="w-5 h-5 text-purple-400 shrink-0 mt-0.5"></i>
               <div class="text-xs text-slate-300 leading-relaxed">
-                Enregistre ici un <strong>Max de répétitions sur 1 série</strong>, un <strong>Max lesté</strong> ou un <strong>Maintien statique maximal (en secondes)</strong> réalisé en dehors de ta routine. Il mettra directement à jour tes Records (PR) et ton graphique.
+                Enregistre ici un <strong>Max de répétitions sur 1 série</strong>, un <strong>Max lesté</strong> ou un <strong>Maintien statique maximal (en secondes)</strong> réalisé en dehors de ta routine.
               </div>
             </div>
 
@@ -328,7 +327,6 @@
             </button>
           </div>
 
-          <!-- Add New Skill Form (Collapsible) -->
           <div id="newSkillForm" class="hidden bg-bgMain border border-purple-500/30 rounded-xl p-4 space-y-3">
             <h3 class="text-xs font-bold uppercase text-purple-400">Ajouter un objectif de figure</h3>
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
@@ -375,7 +373,6 @@
             </div>
           </div>
 
-          <!-- Skills Grid -->
           <div id="skillsGridContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
         </div>
 
@@ -444,17 +441,17 @@
     </div>
   </main>
 
-  <!-- SYNC PC ↔ PHONE MODAL -->
+  <!-- DATABASE & SYNC MODAL -->
   <div id="syncModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="bg-bgCard border border-borderDark rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-borderDark pb-3">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400">
-            <i data-lucide="Smartphone" class="w-5 h-5"></i>
+            <i data-lucide="Database" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="text-base font-bold text-white">Synchroniser PC ↔ Téléphone & Cloud</h3>
-            <p class="text-xs text-slate-400">Transfère tes routines et séances en 1 clic ou connecte Firebase</p>
+            <h3 class="text-base font-bold text-white">Base de Données Cloud Temps Réel</h3>
+            <p class="text-xs text-slate-400">Synchronisation automatique entre PC et Téléphone</p>
           </div>
         </div>
         <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white p-1">
@@ -462,47 +459,32 @@
         </button>
       </div>
 
-      <!-- METHOD 1: INSTANT COPY / PASTE CODE (NO ACCOUNT NEEDED) -->
-      <div class="bg-bgMain border border-orange-500/30 rounded-xl p-4 space-y-3">
+      <!-- FIREBASE REALTIME DATABASE URL -->
+      <div class="bg-bgMain border border-sky-500/30 rounded-xl p-4 space-y-3">
         <div class="flex items-center justify-between">
-          <h4 class="text-xs font-bold uppercase text-orange-400">Méthode 1 : Code de Transfert Instantané (Sans compte)</h4>
-          <span class="text-[10px] px-2 py-0.5 rounded bg-orange-500/15 text-orange-300">Le plus rapide</span>
+          <h4 class="text-xs font-bold uppercase text-sky-400">URL Firebase Realtime Database</h4>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-sky-500/15 text-sky-300">Auto-Sync</span>
         </div>
         <p class="text-xs text-slate-300 leading-relaxed">
-          Clique sur <strong>Copier mon code</strong> sur ton PC, envoie-le-toi par message (Discord, WhatsApp, Notes) et colle-le ici sur ton téléphone :
+          Colle l'URL de ta base <a href="https://console.firebase.google.com/" target="_blank" class="text-sky-400 underline">Firebase Realtime Database</a> ci-dessous (ou inscris-la dans la constante <code class="text-orange-400">FIREBASE_DB_URL</code> du fichier <code class="text-orange-400">index.html</code> sur GitHub pour ne plus jamais avoir à la saisir) :
         </p>
-        <div class="flex gap-2">
-          <input type="text" id="syncCodeInput" placeholder="Colle ici le code de sauvegarde pour restaurer..." class="flex-1 bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono focus:outline-none focus:border-orange-500" />
-          <button onclick="copySyncCode()" class="px-3.5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs whitespace-nowrap flex items-center gap-1.5 transition">
-            <i data-lucide="Copy" class="w-3.5 h-3.5"></i>
-            Copier mon code
+        <input type="url" id="cloudEndpointInput" placeholder="https://calisthenics-pro-default-rtdb.europe-west1.firebasedatabase.app" class="w-full bg-bgCard border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500" />
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <input type="text" id="cloudUserKeyInput" value="mathis_sw" placeholder="Identifiant (mathis_sw)" class="bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono" />
+          <button onclick="connectAndPullCloud()" class="py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="RefreshCw" class="w-3.5 h-3.5"></i>
+            Connecter & Charger
           </button>
-          <button onclick="restoreFromSyncCode()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs whitespace-nowrap flex items-center gap-1.5 transition">
-            <i data-lucide="Check" class="w-3.5 h-3.5"></i>
-            Charger
+          <button onclick="pushToCloud(true)" class="py-2 px-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="UploadCloud" class="w-3.5 h-3.5"></i>
+            Forcer l'envoi Cloud
           </button>
         </div>
       </div>
 
-      <!-- METHOD 2: AUTOMATIC CLOUD FIREBASE REALTIME DB -->
-      <div class="bg-bgMain border border-borderDark rounded-xl p-4 space-y-3">
-        <h4 class="text-xs font-bold uppercase text-sky-400">Méthode 2 : Synchronisation Cloud Automatique (Firebase)</h4>
-        <p class="text-[11px] text-slate-400 leading-relaxed">
-          Si tu as créé une Realtime Database gratuite sur <a href="https://console.firebase.google.com/" target="_blank" class="text-sky-400 underline">Firebase</a>, colle son URL ci-dessous sur ton PC et sur ton téléphone pour qu'ils se synchronisent automatiquement :
-        </p>
-        <input type="url" id="cloudEndpointInput" placeholder="https://ton-projet-default-rtdb.europe-west1.firebasedatabase.app" class="w-full bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500" />
-        <div class="grid grid-cols-2 gap-2">
-          <input type="text" id="cloudUserKeyInput" value="mathis_sw" placeholder="Clé profil (ex: mathis_sw)" class="bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono" />
-          <div class="flex gap-2">
-            <button onclick="pushToCloud(true)" class="flex-1 py-2 px-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs">Envoyer Cloud</button>
-            <button onclick="pullFromCloud(true)" class="flex-1 py-2 px-3 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-bold text-xs">Récupérer Cloud</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- METHOD 3: JSON FILE EXPORT / IMPORT -->
+      <!-- EXPORT / IMPORT JSON -->
       <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-borderDark">
-        <span class="text-xs text-slate-400">Sauvegarde par fichier (.JSON) :</span>
+        <span class="text-xs text-slate-400">Sauvegarde fichier de secours (.JSON) :</span>
         <div class="flex items-center gap-2">
           <button onclick="exportDataJson()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1.5">
             <i data-lucide="Download" class="w-3.5 h-3.5 text-orange-400"></i> Exporter .JSON
@@ -527,16 +509,16 @@
   </div>
 
   <script>
+    // ============================================================================
+    // 👉 COLLE TON LIEN FIREBASE REALTIME DATABASE CI-DESSOUS ENTRE LES GUILLEMETS
+    // Exemple : const FIREBASE_DB_URL = "https://calisthenics-pro-default-rtdb.europe-west1.firebasedatabase.app";
+    // ============================================================================
+    const FIREBASE_DB_URL = "https://console.firebase.google.com/project/calisthenics-pro-623db/database/calisthenics-pro-623db-default-rtdb/data/~2F";
+    const DEFAULT_USER_KEY = "mathis_sw";
+
     const MASTER_STORAGE_KEY = 'calisthenics_pro_master_state';
-    const LEGACY_KEYS = [
-      'calisthenics_pro_v3_state',
-      'calisthenics_pro_v2_state',
-      'calisthenics_pro_v1_state',
-      'calisthenics_pro_state'
-    ];
     const CLOUD_CONFIG_KEY = 'calisthenics_pro_cloud_cfg';
 
-    // Catalogue complet d'exercices pour la liste déroulante
     const EXERCISE_CATALOG = [
       {
         category: 'Tirage (Pull)',
@@ -593,6 +575,7 @@
     ];
 
     const defaultState = {
+      updatedAt: 0,
       activeRoutineId: 'routine_upper_1',
       autoLevelUp: true,
       routines: [
@@ -640,65 +623,170 @@
       ]
     };
 
-    let appState = loadAndRecoverState();
+    let appState = loadLocalState();
     let currentSessionDraft = [];
     let chartInstance = null;
+    let pushDebounceTimer = null;
 
     // Timer variables
-    let timerMode = 'rest'; // 'rest' or 'hold'
+    let timerMode = 'rest';
     let timerSeconds = 90;
     let timerInterval = null;
 
-    // Récupération intelligente (fouille toutes les anciennes clés localStorage sur le PC)
-    function loadAndRecoverState() {
+    function getActiveCloudUrl() {
+      const cleanHardcoded = (FIREBASE_DB_URL && FIREBASE_DB_URL !== "COLLE_TON_LIEN_FIREBASE_ICI")
+        ? FIREBASE_DB_URL.trim().replace(/\/+$/, '')
+        : '';
+      if (cleanHardcoded) {
+        return { endpoint: cleanHardcoded, userKey: DEFAULT_USER_KEY };
+      }
       try {
-        const masterRaw = localStorage.getItem(MASTER_STORAGE_KEY);
-        if (masterRaw) {
-          const parsed = JSON.parse(masterRaw);
+        const raw = localStorage.getItem(CLOUD_CONFIG_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.endpoint) return parsed;
+        }
+      } catch (e) {}
+      return { endpoint: '', userKey: DEFAULT_USER_KEY };
+    }
+
+    function buildFirebaseRestEndpoint(cfg) {
+      if (!cfg.endpoint) return '';
+      if (cfg.endpoint.endsWith('.json')) return cfg.endpoint;
+      return `${cfg.endpoint}/calisthenics/${cfg.userKey || DEFAULT_USER_KEY}.json`;
+    }
+
+    function updateStatusIndicator(statusType, text) {
+      const badge = document.getElementById('saveIndicatorBadge');
+      const dot = document.getElementById('cloudStatusDot');
+      const btnLabel = document.getElementById('cloudBtnLabel');
+
+      if (statusType === 'cloud_ok') {
+        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+        badge.textContent = text || '☁️ Synchronisé Cloud';
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+        btnLabel.textContent = 'Cloud Connecté';
+      } else if (statusType === 'syncing') {
+        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/30';
+        badge.textContent = text || '↻ Synchronisation...';
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse';
+      } else {
+        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30';
+        badge.textContent = text || 'Sauvegarde Locale (Clique sur Base Cloud)';
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
+        btnLabel.textContent = 'Configurer Cloud';
+      }
+    }
+
+    function loadLocalState() {
+      try {
+        const raw = localStorage.getItem(MASTER_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
           if (parsed && Array.isArray(parsed.routines)) return normalizeState(parsed);
         }
-        // Sinon, cherche dans les anciennes clés des versions précédentes
-        for (const key of LEGACY_KEYS) {
-          const raw = localStorage.getItem(key);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (parsed && Array.isArray(parsed.routines)) {
-              const normalized = normalizeState(parsed);
-              localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(normalized));
-              return normalized;
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('Erreur lecture localStorage:', e);
-      }
-      const initial = JSON.parse(JSON.stringify(defaultState));
-      localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(initial));
-      return initial;
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(defaultState));
     }
 
     function normalizeState(st) {
       if (!Array.isArray(st.skills)) st.skills = JSON.parse(JSON.stringify(defaultState.skills));
       if (typeof st.autoLevelUp !== 'boolean') st.autoLevelUp = true;
-      if (Array.isArray(st.draft) && st.draft.length > 0) {
-        currentSessionDraft = st.draft;
-      }
+      if (Array.isArray(st.draft) && st.draft.length > 0) currentSessionDraft = st.draft;
       return st;
     }
 
+    // Save locally AND push to Firebase Realtime DB automatically
     function saveStateImmediate() {
       try {
+        appState.updatedAt = Date.now();
         appState.draft = currentSessionDraft;
         localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(appState));
-        const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        const badge = document.getElementById('saveIndicatorBadge');
-        if (badge) badge.textContent = `✓ Sauvegardé • ${now}`;
 
-        const cfg = getCloudConfig();
-        if (cfg.endpoint) pushToCloud(false);
+        const cfg = getActiveCloudUrl();
+        if (cfg.endpoint) {
+          updateStatusIndicator('syncing', '↻ Envoi Cloud...');
+          clearTimeout(pushDebounceTimer);
+          pushDebounceTimer = setTimeout(() => {
+            pushToCloud(false);
+          }, 250);
+        } else {
+          const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          updateStatusIndicator('local', `✓ Local (${now}) • Clique sur Configurer Cloud`);
+        }
       } catch (e) {
         console.error('Erreur sauvegarde:', e);
       }
+    }
+
+    // Automatic Cloud Pull on startup & tab focus
+    async function autoSyncFromCloudOnStartup() {
+      const cfg = getActiveCloudUrl();
+      if (!cfg.endpoint) {
+        updateStatusIndicator('local', 'Mode Local • Clique sur "Configurer Cloud"');
+        return;
+      }
+      updateStatusIndicator('syncing', '↻ Récupération Cloud...');
+      try {
+        const res = await fetch(buildFirebaseRestEndpoint(cfg), { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        if (data && data.state && Array.isArray(data.state.routines)) {
+          appState = normalizeState(data.state);
+          localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(appState));
+          initSessionDraftFromRoutine(false);
+          refreshAllDashboardViews();
+          const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+          updateStatusIndicator('cloud_ok', `☁️ Synchronisé Cloud • ${now}`);
+        } else {
+          // La base Firebase est vide pour l'instant : on y pousse les données actuelles
+          await pushToCloud(false);
+        }
+      } catch (e) {
+        updateStatusIndicator('local', '⚠️ Erreur Cloud (Vérifie le lien Firebase)');
+      }
+    }
+
+    async function pushToCloud(verbose = true) {
+      const cfg = getActiveCloudUrl();
+      const msg = document.getElementById('cloudFeedbackMsg');
+      if (!cfg.endpoint) return;
+      try {
+        const res = await fetch(buildFirebaseRestEndpoint(cfg), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            updatedAt: Date.now(),
+            state: appState
+          })
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        updateStatusIndicator('cloud_ok', `☁️ Synchronisé Cloud • ${now}`);
+        if (verbose && msg) {
+          msg.textContent = '✓ Base de données Cloud mise à jour avec succès !';
+          showToast('Synchronisé dans le Cloud !');
+        }
+      } catch (e) {
+        updateStatusIndicator('local', '⚠️ Erreur écriture Cloud');
+        if (verbose && msg) msg.textContent = 'Erreur : Vérifie ton URL Firebase et que les Rules sont en ".read": true, ".write": true.';
+      }
+    }
+
+    async function connectAndPullCloud() {
+      const endpoint = document.getElementById('cloudEndpointInput').value.trim().replace(/\/+$/, '');
+      const userKey = (document.getElementById('cloudUserKeyInput').value.trim() || DEFAULT_USER_KEY).replace(/[^a-zA-Z0-9_-]/g, '');
+      const msg = document.getElementById('cloudFeedbackMsg');
+      if (!endpoint) {
+        msg.textContent = 'Colle ton lien Firebase Realtime Database ci-dessus.';
+        return;
+      }
+      localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ endpoint, userKey }));
+      msg.textContent = 'Connexion à Firebase en cours...';
+      await autoSyncFromCloudOnStartup();
+      msg.textContent = '✓ Connecté et synchronisé !';
+      showToast('Base de données Cloud connectée !');
     }
 
     function populateExerciseSelects() {
@@ -788,7 +876,6 @@
         actualWeight: Number(ex.targetWeight) || 0,
         achievedSets: Array.from({ length: Number(ex.targetSets) || 4 }, () => Number(ex.targetReps) || 10)
       }));
-      saveStateImmediate();
     }
 
     function renderRoutineSelect() {
@@ -813,6 +900,7 @@
     function handleRoutineChange() {
       appState.activeRoutineId = document.getElementById('activeRoutineSelect').value;
       initSessionDraftFromRoutine(true);
+      saveStateImmediate();
       renderSessionLoggingView();
       renderRoutineBuilderView();
     }
@@ -856,7 +944,6 @@
       lucide.createIcons();
     }
 
-    // TAB 1: SESSION LOGGING
     function renderSessionLoggingView() {
       const container = document.getElementById('sessionExercisesContainer');
       container.innerHTML = '';
@@ -1010,7 +1097,6 @@
         }))
       };
 
-      // Auto Level-Up check
       let leveledUpCount = 0;
       if (appState.autoLevelUp && routine) {
         currentSessionDraft.forEach((draftEx, idx) => {
@@ -1031,9 +1117,9 @@
       refreshAllDashboardViews();
 
       if (leveledUpCount > 0) {
-        showToast(`Séance enregistrée ! 🔥 +1 rep sur ${leveledUpCount} exercice(s) pour la prochaine séance !`);
+        showToast(`Séance enregistrée ! 🔥 +1 rep sur ${leveledUpCount} exercice(s) !`);
       } else {
-        showToast('Séance enregistrée avec succès !');
+        showToast('Séance enregistrée et synchronisée !');
       }
     }
 
@@ -1122,7 +1208,7 @@
       renderRoutineSelect();
       renderRoutineBuilderView();
       populateChartExerciseDropdown();
-      showToast(`"${name}" ajouté et sauvegardé !`);
+      showToast(`"${name}" ajouté et synchronisé !`);
     }
 
     function updateRoutineExerciseField(exIdx, field, value) {
@@ -1182,7 +1268,7 @@
       renderRoutineBuilderView();
     }
 
-    // TAB 3: SAVE MAX RECORD OUTSIDE ROUTINE
+    // TAB 3: MAX RECORD OUTSIDE ROUTINE
     function saveMaxRecord() {
       const sel = document.getElementById('maxExerciseSelect');
       const customInp = document.getElementById('maxCustomExName');
@@ -1224,7 +1310,7 @@
       showToast(`Nouveau Max enregistré sur ${exName} : ${val} ${unit} !`);
     }
 
-    // SKILLS & FIGURES TRACKER
+    // SKILLS & FIGURES
     function toggleNewSkillForm() {
       document.getElementById('newSkillForm').classList.toggle('hidden');
     }
@@ -1259,7 +1345,6 @@
       appState.skills.forEach((sk, idx) => {
         const pct = sk.target > 0 ? Math.min(100, Math.round((sk.current / sk.target) * 100)) : 0;
         const done = sk.current >= sk.target;
-
         const varOptions = variants.map(v => `<option value="${v}" ${sk.variant === v ? 'selected' : ''}>${v}</option>`).join('');
 
         const card = document.createElement('div');
@@ -1546,7 +1631,7 @@
       });
     }
 
-    // DUAL TIMER (REST + HOLD STOPWATCH)
+    // DUAL TIMER
     function formatTimer(sec) {
       const m = String(Math.floor(sec / 60)).padStart(2, '0');
       const s = String(sec % 60).padStart(2, '0');
@@ -1630,11 +1715,11 @@
       showToast(`Temps de maintien (${timerSeconds}s) envoyé dans le formulaire de Max !`);
     }
 
-    // SYNC PC ↔ PHONE (COPY-PASTE CODE + FIREBASE CLOUD + JSON)
+    // MODAL & JSON BACKUP
     function openSyncModal() {
-      const cfg = getCloudConfig();
+      const cfg = getActiveCloudUrl();
       document.getElementById('cloudEndpointInput').value = cfg.endpoint || '';
-      document.getElementById('cloudUserKeyInput').value = cfg.userKey || 'mathis_sw';
+      document.getElementById('cloudUserKeyInput').value = cfg.userKey || DEFAULT_USER_KEY;
       document.getElementById('syncModal').classList.remove('hidden');
       document.getElementById('syncModal').classList.add('flex');
     }
@@ -1642,90 +1727,6 @@
     function closeSyncModal() {
       document.getElementById('syncModal').classList.add('hidden');
       document.getElementById('syncModal').classList.remove('flex');
-    }
-
-    function copySyncCode() {
-      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(appState))));
-      document.getElementById('syncCodeInput').value = encoded;
-      navigator.clipboard.writeText(encoded);
-      document.getElementById('cloudFeedbackMsg').textContent = '✓ Code copié ! Envoie-le sur ton téléphone et colle-le pour tout récupérer.';
-      showToast('Code de sauvegarde copié dans le presse-papiers !');
-    }
-
-    function restoreFromSyncCode() {
-      const raw = document.getElementById('syncCodeInput').value.trim();
-      if (!raw) {
-        alert('Colle d’abord ton code de sauvegarde dans le champ.');
-        return;
-      }
-      try {
-        const decoded = JSON.parse(decodeURIComponent(escape(atob(raw))));
-        if (decoded && Array.isArray(decoded.routines)) {
-          appState = normalizeState(decoded);
-          initSessionDraftFromRoutine(false);
-          saveStateImmediate();
-          refreshAllDashboardViews();
-          closeSyncModal();
-          showToast('Toutes tes routines et séances ont été restaurées !');
-        }
-      } catch (e) {
-        alert('Code de sauvegarde invalide ou incomplet.');
-      }
-    }
-
-    function getCloudConfig() {
-      try {
-        const raw = localStorage.getItem(CLOUD_CONFIG_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch (e) {}
-      return { endpoint: '', userKey: 'mathis_sw' };
-    }
-
-    function saveCloudConfig() {
-      const endpoint = document.getElementById('cloudEndpointInput').value.trim().replace(/\/+$/, '');
-      const userKey = (document.getElementById('cloudUserKeyInput').value.trim() || 'mathis_sw').replace(/[^a-zA-Z0-9_-]/g, '');
-      const cfg = { endpoint, userKey };
-      localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cfg));
-      return cfg;
-    }
-
-    async function pushToCloud(verbose = true) {
-      const cfg = saveCloudConfig();
-      const msg = document.getElementById('cloudFeedbackMsg');
-      if (!cfg.endpoint) return;
-      try {
-        const url = cfg.endpoint.endsWith('.json') ? cfg.endpoint : `${cfg.endpoint}/calisthenics/${cfg.userKey}.json`;
-        const res = await fetch(url, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ updatedAt: new Date().toISOString(), state: appState })
-        });
-        if (!res.ok) throw new Error();
-        if (verbose && msg) msg.textContent = '✓ Synchronisé dans le Cloud Firebase !';
-      } catch (e) {
-        if (verbose && msg) msg.textContent = 'Erreur Cloud : vérifie ton URL Firebase.';
-      }
-    }
-
-    async function pullFromCloud(verbose = true) {
-      const cfg = saveCloudConfig();
-      const msg = document.getElementById('cloudFeedbackMsg');
-      if (!cfg.endpoint) return;
-      try {
-        const url = cfg.endpoint.endsWith('.json') ? cfg.endpoint : `${cfg.endpoint}/calisthenics/${cfg.userKey}.json`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data && data.state && Array.isArray(data.state.routines)) {
-          appState = normalizeState(data.state);
-          initSessionDraftFromRoutine(false);
-          saveStateImmediate();
-          refreshAllDashboardViews();
-          if (verbose && msg) msg.textContent = '✓ Données récupérées depuis le Cloud !';
-          showToast('Synchronisé depuis le Cloud !');
-        }
-      } catch (e) {
-        if (verbose && msg) msg.textContent = 'Impossible de charger depuis le Cloud.';
-      }
     }
 
     function exportDataJson() {
@@ -1751,7 +1752,7 @@
             saveStateImmediate();
             refreshAllDashboardViews();
             closeSyncModal();
-            showToast('Fichier .JSON importé avec succès !');
+            showToast('Fichier .JSON importé et synchronisé !');
           }
         } catch (err) {
           alert('Fichier JSON invalide.');
@@ -1779,13 +1780,22 @@
       lucide.createIcons();
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    // INITIALISATION + AUTO-PULL AU DÉMARRAGE ET AU RETOUR SUR L'ONGLET
+    window.addEventListener('DOMContentLoaded', async () => {
       const today = new Date().toISOString().slice(0, 10);
       document.getElementById('sessionDateInput').value = today;
       document.getElementById('maxDateInput').value = today;
       populateExerciseSelects();
       initSessionDraftFromRoutine(false);
       refreshAllDashboardViews();
+      await autoSyncFromCloudOnStartup();
+    });
+
+    // Quand tu déverrouilles ton téléphone ou reviens sur la page, récupère automatiquement les nouveautés
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        autoSyncFromCloudOnStartup();
+      }
     });
   </script>
 </body>
