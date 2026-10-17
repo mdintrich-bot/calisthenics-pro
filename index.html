@@ -2,7 +2,7 @@
 <html lang="fr" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>CALISTHENICS PRO — Street Workout & Cloud Sync</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -24,58 +24,78 @@
   </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
-    body { font-family: 'Inter', sans-serif; background-color: #090b10; color: #f3f4f6; }
+    html, body {
+      font-family: 'Inter', sans-serif;
+      background-color: #090b10;
+      color: #f3f4f6;
+      overflow-x: hidden;
+      width: 100%;
+    }
     .mono { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #090b10; }
     ::-webkit-scrollbar-thumb { background: #263044; border-radius: 3px; }
+    select {
+      text-overflow: ellipsis;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
 
   <!-- TOP NAVBAR -->
-  <header class="sticky top-0 z-30 bg-bgMain/95 backdrop-blur-md border-b border-borderDark px-4 lg:px-8 py-3">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
-          <i data-lucide="Flame" class="w-6 h-6 text-white"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <h1 class="text-lg font-extrabold tracking-tight text-white">CALISTHENICS <span class="text-orange-500">PRO</span></h1>
-            <span id="saveIndicatorBadge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">
-              Connexion Cloud...
-            </span>
+  <header class="sticky top-0 z-30 bg-bgMain/95 backdrop-blur-md border-b border-borderDark px-3 sm:px-6 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <!-- Brand + Status -->
+      <div class="flex items-center justify-between gap-2 min-w-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+            <i data-lucide="Flame" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
           </div>
-          <p class="text-xs text-slate-400">Synchronisation Temps Réel PC & Téléphone</p>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white whitespace-nowrap">
+                CALISTHENICS <span class="text-orange-500">PRO</span>
+              </h1>
+              <span id="saveIndicatorBadge" class="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 truncate">
+                Connexion Cloud...
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400 truncate hidden sm:block">Synchronisation Temps Réel PC & Téléphone</p>
+          </div>
         </div>
+
+        <!-- Mobile Cloud Button -->
+        <button onclick="openSyncModal()" class="sm:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-bgCard border border-borderDark text-xs font-bold text-white shrink-0">
+          <span id="cloudStatusDotMobile" class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <i data-lucide="Database" class="w-3.5 h-3.5 text-sky-400"></i>
+        </button>
       </div>
 
-      <!-- Dual Timer + Cloud Settings Button -->
-      <div class="flex items-center gap-2.5 flex-wrap">
+      <!-- Dual Timer + Desktop Cloud Button -->
+      <div class="flex items-center justify-between sm:justify-end gap-2 flex-wrap">
         <!-- Timer -->
-        <div class="flex items-center gap-1.5 bg-bgCard border border-borderDark rounded-xl px-3 py-1.5">
-          <button onclick="switchTimerMode()" id="timerModeBtn" class="text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 transition" title="Basculer Repos / Maintien">
+        <div class="flex-1 sm:flex-initial flex items-center justify-between sm:justify-start gap-1.5 bg-bgCard border border-borderDark rounded-xl px-2.5 py-1.5">
+          <button onclick="switchTimerMode()" id="timerModeBtn" class="text-[10px] sm:text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 transition shrink-0" title="Basculer Repos / Maintien">
             Repos
           </button>
-          <span id="timerDisplay" class="mono text-sm font-bold text-white w-14 text-center">01:30</span>
-          <button onclick="toggleTimer()" id="timerStartBtn" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition">
+          <span id="timerDisplay" class="mono text-xs sm:text-sm font-bold text-white w-12 sm:w-14 text-center shrink-0">01:30</span>
+          <button onclick="toggleTimer()" id="timerStartBtn" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition shrink-0">
             Go
           </button>
-          <button onclick="resetTimer()" class="p-1 text-slate-400 hover:text-white" title="Réinitialiser">
+          <button onclick="resetTimer()" class="p-1 text-slate-400 hover:text-white shrink-0" title="Réinitialiser">
             <i data-lucide="RotateCcw" class="w-3.5 h-3.5"></i>
           </button>
-          <div id="restPresets" class="flex items-center gap-1 border-l border-borderDark pl-1.5">
-            <button onclick="setPresetTimer(90)" class="text-[11px] text-slate-400 hover:text-white px-1">1m30</button>
-            <button onclick="setPresetTimer(120)" class="text-[11px] text-slate-400 hover:text-white px-1">2m</button>
+          <div id="restPresets" class="flex items-center gap-1 border-l border-borderDark pl-1.5 shrink-0">
+            <button onclick="setPresetTimer(90)" class="text-[10px] sm:text-[11px] text-slate-400 hover:text-white px-1">1m30</button>
+            <button onclick="setPresetTimer(120)" class="text-[10px] sm:text-[11px] text-slate-400 hover:text-white px-1">2m</button>
           </div>
-          <button id="sendHoldToMaxBtn" onclick="sendStopwatchToMax()" class="hidden text-[11px] font-bold text-purple-400 hover:text-purple-300 border-l border-borderDark pl-2">
+          <button id="sendHoldToMaxBtn" onclick="sendStopwatchToMax()" class="hidden text-[10px] sm:text-[11px] font-bold text-purple-400 hover:text-purple-300 border-l border-borderDark pl-2 shrink-0">
             → Max
           </button>
         </div>
 
-        <!-- Cloud Config Button -->
-        <button onclick="openSyncModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-bgCard hover:bg-bgCardHover border border-borderDark transition text-xs font-bold text-white">
+        <!-- Desktop Cloud Button -->
+        <button onclick="openSyncModal()" class="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-bgCard hover:bg-bgCardHover border border-borderDark transition text-xs font-bold text-white shrink-0">
           <span id="cloudStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
           <i data-lucide="Database" class="w-4 h-4 text-sky-400"></i>
           <span id="cloudBtnLabel">Base Cloud</span>
@@ -85,141 +105,147 @@
   </header>
 
   <!-- MAIN CONTENT -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-5">
 
     <!-- BANNER IF FIREBASE RULES ARE LOCKED -->
     <div id="firebaseRulesAlert" class="hidden bg-rose-500/10 border border-rose-500/40 rounded-2xl p-4 text-xs text-rose-200 space-y-2">
       <div class="flex items-center gap-2 font-bold text-rose-400 text-sm">
-        <i data-lucide="AlertTriangle" class="w-5 h-5"></i>
+        <i data-lucide="AlertTriangle" class="w-5 h-5 shrink-0"></i>
         <span>Action requise sur ta console Firebase : Règles (Rules) verrouillées</span>
       </div>
       <p>Ta base <strong>calisthenics-pro-623db</strong> est bien trouvée, mais Firebase bloque l'écriture tant que les règles sont sur <code>false</code>. Va sur ta console Firebase &gt; onglet <strong>Règles (Rules)</strong>, colle <code>{ "rules": { ".read": true, ".write": true } }</code> et clique sur <strong>Publier</strong>.</p>
     </div>
 
     <!-- KPI SUMMARY BAR -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-bgCard border border-borderDark rounded-2xl p-4 flex items-center justify-between">
-        <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold">Séances & Tests</p>
-          <p id="kpiTotalSessions" class="text-2xl font-extrabold text-white mt-1 mono">0</p>
-          <p id="kpiLastSessionDate" class="text-[11px] text-slate-400 mt-1">Aucune séance</p>
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="bg-bgCard border border-borderDark rounded-2xl p-3.5 sm:p-4 flex items-center justify-between min-w-0">
+        <div class="min-w-0 pr-2">
+          <p class="text-[10px] sm:text-xs text-slate-400 uppercase font-semibold truncate">Séances & Tests</p>
+          <p id="kpiTotalSessions" class="text-xl sm:text-2xl font-extrabold text-white mt-0.5 mono">0</p>
+          <p id="kpiLastSessionDate" class="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Aucune séance</p>
         </div>
-        <div class="w-11 h-11 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
-          <i data-lucide="CalendarCheck" class="w-5 h-5"></i>
-        </div>
-      </div>
-
-      <div class="bg-bgCard border border-borderDark rounded-2xl p-4 flex items-center justify-between">
-        <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold">Taux Objectif Moyen</p>
-          <p id="kpiAvgCompletion" class="text-2xl font-extrabold text-emerald-400 mt-1 mono">0%</p>
-          <p class="text-[11px] text-slate-400 mt-1">Reps réussies / Objectif</p>
-        </div>
-        <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-          <i data-lucide="Target" class="w-5 h-5"></i>
+        <div class="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
+          <i data-lucide="CalendarCheck" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </div>
       </div>
 
-      <div class="bg-bgCard border border-borderDark rounded-2xl p-4 flex items-center justify-between">
-        <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold">Figures Validées</p>
-          <p id="kpiSkillsValidated" class="text-2xl font-extrabold text-purple-400 mt-1 mono">0 / 0</p>
-          <p class="text-[11px] text-slate-400 mt-1">Objectifs de skills atteints</p>
+      <div class="bg-bgCard border border-borderDark rounded-2xl p-3.5 sm:p-4 flex items-center justify-between min-w-0">
+        <div class="min-w-0 pr-2">
+          <p class="text-[10px] sm:text-xs text-slate-400 uppercase font-semibold truncate">Taux Objectif</p>
+          <p id="kpiAvgCompletion" class="text-xl sm:text-2xl font-extrabold text-emerald-400 mt-0.5 mono">0%</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Réussies / Objectif</p>
         </div>
-        <div class="w-11 h-11 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-          <i data-lucide="Sparkles" class="w-5 h-5"></i>
+        <div class="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <i data-lucide="Target" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </div>
       </div>
 
-      <div class="bg-bgCard border border-borderDark rounded-2xl p-4 flex items-center justify-between">
-        <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold">Meilleur Record (PR)</p>
-          <p id="kpiBestPR" class="text-base font-extrabold text-amber-400 mt-1 truncate max-w-[150px]">—</p>
-          <p id="kpiBestPRSub" class="text-[11px] text-slate-400 mt-1">Max sur 1 série</p>
+      <div class="bg-bgCard border border-borderDark rounded-2xl p-3.5 sm:p-4 flex items-center justify-between min-w-0">
+        <div class="min-w-0 pr-2">
+          <p class="text-[10px] sm:text-xs text-slate-400 uppercase font-semibold truncate">Figures Validées</p>
+          <p id="kpiSkillsValidated" class="text-xl sm:text-2xl font-extrabold text-purple-400 mt-0.5 mono">0 / 0</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Objectifs atteints</p>
         </div>
-        <div class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-          <i data-lucide="Trophy" class="w-5 h-5"></i>
+        <div class="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+          <i data-lucide="Sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        </div>
+      </div>
+
+      <div class="bg-bgCard border border-borderDark rounded-2xl p-3.5 sm:p-4 flex items-center justify-between min-w-0">
+        <div class="min-w-0 pr-2">
+          <p class="text-[10px] sm:text-xs text-slate-400 uppercase font-semibold truncate">Meilleur Record</p>
+          <p id="kpiBestPR" class="text-sm sm:text-base font-extrabold text-amber-400 mt-0.5 truncate">—</p>
+          <p id="kpiBestPRSub" class="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">Max sur 1 série</p>
+        </div>
+        <div class="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+          <i data-lucide="Trophy" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </div>
       </div>
     </section>
 
     <!-- MAIN GRID -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
 
       <!-- LEFT COLUMN (7 COLS): WORKOUT TABS + SKILLS TRACKER -->
-      <div class="lg:col-span-7 space-y-6">
+      <div class="lg:col-span-7 space-y-5 sm:space-y-6 min-w-0">
 
         <!-- CARD 1: ROUTINE, SESSION & MAX LOGGING -->
         <div class="bg-bgCard border border-borderDark rounded-2xl overflow-hidden shadow-xl">
           <!-- 3 Navigation Tabs -->
           <div class="grid grid-cols-3 border-b border-borderDark bg-slate-900/60">
-            <button id="tabBtnSession" onclick="switchMainTab('session')" class="py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-orange-500 text-orange-400 bg-orange-500/5 transition">
+            <button id="tabBtnSession" onclick="switchMainTab('session')" class="py-3 px-1.5 sm:px-3 text-[11px] sm:text-sm font-bold flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 border-b-2 border-orange-500 text-orange-400 bg-orange-500/5 transition">
               <i data-lucide="CheckCircle2" class="w-4 h-4 shrink-0"></i>
-              <span>1. Fin de Séance</span>
+              <span class="truncate">1. Fin de Séance</span>
             </button>
-            <button id="tabBtnBuilder" onclick="switchMainTab('builder')" class="py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition">
+            <button id="tabBtnBuilder" onclick="switchMainTab('builder')" class="py-3 px-1.5 sm:px-3 text-[11px] sm:text-sm font-bold flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition">
               <i data-lucide="Sliders" class="w-4 h-4 shrink-0"></i>
-              <span>2. Éditer Routine</span>
+              <span class="truncate">2. Éditer Routine</span>
             </button>
-            <button id="tabBtnMax" onclick="switchMainTab('max')" class="py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition">
+            <button id="tabBtnMax" onclick="switchMainTab('max')" class="py-3 px-1.5 sm:px-3 text-[11px] sm:text-sm font-bold flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition">
               <i data-lucide="Zap" class="w-4 h-4 shrink-0 text-purple-400"></i>
-              <span>3. Max Hors Routine</span>
+              <span class="truncate">3. Max Hors Routine</span>
             </button>
           </div>
 
-          <!-- Routine Selector Bar (With DUPLICATE button) -->
-          <div id="routineSelectorBar" class="p-4 bg-slate-900/30 border-b border-borderDark flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-2 flex-1 min-w-[200px]">
-              <label class="text-xs font-semibold text-slate-400 uppercase whitespace-nowrap">Routine :</label>
-              <select id="activeRoutineSelect" onchange="handleRoutineChange()" class="flex-1 bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-sm font-semibold text-white focus:outline-none focus:border-orange-500">
+          <!-- Routine Selector Bar (FIXED: 2 clean rows, zero collision) -->
+          <div id="routineSelectorBar" class="p-3.5 sm:p-4 bg-slate-900/40 border-b border-borderDark space-y-3">
+            <!-- Row 1: Routine Dropdown + Rename & Delete icons -->
+            <div class="flex items-center gap-2 w-full min-w-0">
+              <label for="activeRoutineSelect" class="text-[11px] font-bold text-slate-400 uppercase shrink-0">Routine :</label>
+              <select id="activeRoutineSelect" onchange="handleRoutineChange()" class="flex-1 w-full min-w-0 bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-white truncate focus:outline-none focus:border-orange-500">
               </select>
-            </div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700" title="Augmente automatiquement l'objectif (+1 rep) quand 100% des séries sont validées">
-                <input type="checkbox" id="autoLevelUpToggle" onchange="toggleAutoLevelUp(this.checked)" class="accent-orange-500 rounded" />
-                <span>Auto +1 rep</span>
-              </label>
-              <button onclick="duplicateCurrentRoutine()" class="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-xs font-semibold text-sky-300 flex items-center gap-1 transition" title="Dupliquer cette routine pour créer une variante">
-                <i data-lucide="Copy" class="w-3.5 h-3.5"></i>
-                Dupliquer
-              </button>
-              <button onclick="createNewRoutinePrompt()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1 transition">
-                <i data-lucide="Plus" class="w-3.5 h-3.5 text-orange-400"></i>
-                Nouvelle
-              </button>
-              <button onclick="renameCurrentRoutine()" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Renommer la routine">
+              <button onclick="renameCurrentRoutine()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 shrink-0 transition" title="Renommer la routine">
                 <i data-lucide="Pencil" class="w-4 h-4"></i>
               </button>
-              <button onclick="deleteCurrentRoutine()" class="p-1.5 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Supprimer la routine">
+              <button onclick="deleteCurrentRoutine()" class="p-2 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 shrink-0 transition" title="Supprimer la routine">
                 <i data-lucide="Trash2" class="w-4 h-4"></i>
               </button>
+            </div>
+
+            <!-- Row 2: Action Pills (Auto +1 rep, Dupliquer, + Nouvelle) -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+              <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700 select-none">
+                <input type="checkbox" id="autoLevelUpToggle" onchange="toggleAutoLevelUp(this.checked)" class="accent-orange-500 rounded w-3.5 h-3.5" />
+                <span class="font-semibold">Auto +1 rep (si 100% validé)</span>
+              </label>
+
+              <div class="flex items-center gap-2 ml-auto">
+                <button onclick="duplicateCurrentRoutine()" class="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-xs font-bold text-sky-300 flex items-center gap-1.5 transition">
+                  <i data-lucide="Copy" class="w-3.5 h-3.5 shrink-0"></i>
+                  <span>Dupliquer</span>
+                </button>
+                <button onclick="createNewRoutinePrompt()" class="px-3 py-1.5 rounded-xl bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/30 text-xs font-bold text-orange-300 flex items-center gap-1.5 transition">
+                  <i data-lucide="Plus" class="w-3.5 h-3.5 shrink-0"></i>
+                  <span>Nouvelle</span>
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- TAB 1: END OF SESSION LOGGING -->
-          <div id="viewSessionLogging" class="p-5 space-y-5">
-            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/50 border border-borderDark rounded-xl p-3.5">
-              <div>
+          <div id="viewSessionLogging" class="p-3.5 sm:p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/50 border border-borderDark rounded-xl p-3.5">
+              <div class="min-w-0">
                 <h2 class="text-sm font-bold text-white">Feuille de Séance du Jour</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Saisis tes répétitions réussies, change un exo à la volée ou ajoute un exo bonus en bas.</p>
+                <p class="text-xs text-slate-400 mt-0.5">Entre tes répétitions réussies, change un exo ou ajoute un bonus en bas.</p>
               </div>
-              <div class="flex items-center gap-2">
-                <input type="date" id="sessionDateInput" class="bg-bgMain border border-borderDark rounded-xl px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:border-orange-500" />
-                <button onclick="resetDraftToRoutine()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition" title="Réinitialiser la feuille selon la routine de base">
-                  Réinitialiser
+              <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <input type="date" id="sessionDateInput" class="bg-bgMain border border-borderDark rounded-xl px-2.5 py-1.5 text-xs font-semibold text-white focus:outline-none focus:border-orange-500" />
+                <button onclick="resetDraftToRoutine()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition" title="Réinitialiser selon la routine">
+                  Reset
                 </button>
-                <button onclick="fillAllTargetReps()" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition flex items-center gap-1">
+                <button onclick="fillAllTargetReps()" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition flex items-center gap-1">
                   <i data-lucide="CheckCheck" class="w-3.5 h-3.5"></i>
-                  Tout à 100%
+                  <span>Tout à 100%</span>
                 </button>
               </div>
             </div>
 
             <!-- Live Progress Bar -->
-            <div class="bg-bgMain border border-borderDark rounded-xl p-4 space-y-2">
-              <div class="flex items-center justify-between text-xs">
-                <span class="font-semibold text-slate-300">Progression de la séance</span>
-                <span id="liveSessionScoreText" class="mono font-bold text-orange-400">0 / 0 reps (0%)</span>
+            <div class="bg-bgMain border border-borderDark rounded-xl p-3.5 space-y-2">
+              <div class="flex items-center justify-between text-xs gap-2">
+                <span class="font-semibold text-slate-300 truncate">Progression de la séance</span>
+                <span id="liveSessionScoreText" class="mono font-bold text-orange-400 shrink-0">0 / 0 reps (0%)</span>
               </div>
               <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
                 <div id="liveSessionProgressBar" class="h-full bg-gradient-to-r from-orange-500 to-emerald-400 transition-all duration-300" style="width: 0%"></div>
@@ -227,35 +253,37 @@
             </div>
 
             <!-- Exercises Cards -->
-            <div id="sessionExercisesContainer" class="space-y-4"></div>
+            <div id="sessionExercisesContainer" class="space-y-3.5"></div>
 
             <!-- ADD BONUS / EXTRA EXERCISE FOR TODAY'S SESSION ONLY -->
-            <div class="bg-slate-900/80 border border-dashed border-sky-500/40 rounded-2xl p-4 space-y-3">
-              <div class="flex items-center justify-between">
+            <div class="bg-slate-900/80 border border-dashed border-sky-500/40 rounded-2xl p-3.5 sm:p-4 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-1">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-                  <i data-lucide="PlusCircle" class="w-4 h-4"></i>
-                  <span>Ajouter un exercice en plus à la séance du jour</span>
+                  <i data-lucide="PlusCircle" class="w-4 h-4 shrink-0"></i>
+                  <span>Ajouter un exercice en plus aujourd'hui</span>
                 </h3>
-                <span class="text-[11px] text-slate-400">N'écrase pas ta routine de base</span>
+                <span class="text-[11px] text-slate-400">N'écrase pas ta routine</span>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                <div class="sm:col-span-5">
-                  <select id="bonusExerciseSelect" onchange="toggleBonusCustomInput()" class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-sky-500">
+
+              <div class="space-y-2.5">
+                <div>
+                  <select id="bonusExerciseSelect" onchange="toggleBonusCustomInput()" class="w-full min-w-0 bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-sky-500">
                   </select>
                   <input type="text" id="bonusCustomExName" placeholder="Nom de l'exercice bonus..." class="hidden mt-2 w-full bg-bgMain border border-sky-500/50 rounded-xl px-3 py-2 text-xs text-white focus:outline-none" />
                 </div>
-                <div class="sm:col-span-2">
-                  <input type="number" id="bonusExSets" min="1" max="15" value="3" placeholder="Séries" title="Nombre de séries" class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono text-center" />
-                  <span class="block text-[10px] text-slate-500 text-center mt-0.5">Séries</span>
-                </div>
-                <div class="sm:col-span-2">
-                  <input type="number" id="bonusExReps" min="1" max="300" value="10" placeholder="Reps" title="Répétitions par série" class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono text-center" />
-                  <span class="block text-[10px] text-slate-500 text-center mt-0.5">Reps / Série</span>
-                </div>
-                <div class="sm:col-span-3 flex flex-col">
-                  <button onclick="addBonusExerciseToSession()" class="w-full py-2 px-3 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold text-xs flex items-center justify-center gap-1.5 transition">
-                    <i data-lucide="Plus" class="w-3.5 h-3.5"></i>
-                    Ajouter aujourd'hui
+
+                <div class="grid grid-cols-3 gap-2.5 items-end">
+                  <div>
+                    <label class="block text-[10px] text-slate-400 mb-1">Séries</label>
+                    <input type="number" id="bonusExSets" min="1" max="15" value="3" class="w-full bg-bgMain border border-borderDark rounded-xl px-2.5 py-2 text-xs font-bold text-white mono text-center" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-400 mb-1">Reps / Série</label>
+                    <input type="number" id="bonusExReps" min="1" max="300" value="10" class="w-full bg-bgMain border border-borderDark rounded-xl px-2.5 py-2 text-xs font-bold text-white mono text-center" />
+                  </div>
+                  <button onclick="addBonusExerciseToSession()" class="w-full py-2 px-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold text-xs flex items-center justify-center gap-1 transition">
+                    <i data-lucide="Plus" class="w-3.5 h-3.5 shrink-0"></i>
+                    <span class="truncate">Ajouter</span>
                   </button>
                 </div>
               </div>
@@ -263,51 +291,55 @@
 
             <!-- Submit Session -->
             <div class="pt-2 border-t border-borderDark flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <input type="text" id="sessionNoteInput" placeholder="Note de séance (ex: Ajouté un exo biceps/abdos à la fin, super séance...)" class="flex-1 bg-bgMain border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500" />
-              <button onclick="saveCompletedSession()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-sm shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 transition">
-                <i data-lucide="Save" class="w-4 h-4"></i>
+              <input type="text" id="sessionNoteInput" placeholder="Note de séance (ex: Bonne congestion, RIR 1...)" class="flex-1 min-w-0 bg-bgMain border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500" />
+              <button onclick="saveCompletedSession()" class="px-5 py-3 sm:py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 shrink-0 transition">
+                <i data-lucide="Save" class="w-4 h-4 shrink-0"></i>
                 <span>Valider & Enregistrer la Séance</span>
               </button>
             </div>
           </div>
 
           <!-- TAB 2: ROUTINE BUILDER -->
-          <div id="viewRoutineBuilder" class="p-5 space-y-5 hidden">
-            <div class="bg-bgMain border border-borderDark rounded-xl p-4 space-y-3">
+          <div id="viewRoutineBuilder" class="p-3.5 sm:p-5 space-y-4 hidden">
+            <div class="bg-bgMain border border-borderDark rounded-xl p-3.5 sm:p-4 space-y-3">
               <h3 class="text-xs font-bold uppercase tracking-wider text-orange-400">Ajouter un exercice fixe à la routine</h3>
-              <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                <div class="sm:col-span-5">
+              <div class="space-y-3">
+                <div>
                   <label class="block text-[11px] text-slate-400 mb-1">Choisir dans la liste déroulante</label>
-                  <select id="builderExerciseSelect" onchange="toggleBuilderCustomInput()" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-orange-500">
+                  <select id="builderExerciseSelect" onchange="toggleBuilderCustomInput()" class="w-full min-w-0 bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-orange-500">
                   </select>
-                  <input type="text" id="builderCustomExName" placeholder="Nom de ton exercice personnalisé..." class="hidden mt-2 w-full bg-bgCard border border-orange-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none" />
+                  <input type="text" id="builderCustomExName" placeholder="Nom de ton exercice personnalisé..." class="hidden mt-2 w-full bg-bgCard border border-orange-500/50 rounded-xl px-3 py-2 text-xs text-white focus:outline-none" />
                 </div>
-                <div class="sm:col-span-2">
-                  <label class="block text-[11px] text-slate-400 mb-1">Séries (Obj.)</label>
-                  <input type="number" id="newExSets" min="1" max="20" value="4" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white mono focus:outline-none focus:border-orange-500" />
+
+                <div class="grid grid-cols-3 gap-2.5">
+                  <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Séries (Obj.)</label>
+                    <input type="number" id="newExSets" min="1" max="20" value="4" class="w-full bg-bgCard border border-borderDark rounded-xl px-2.5 py-2 text-xs font-bold text-white mono text-center focus:outline-none focus:border-orange-500" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Reps / Série</label>
+                    <input type="number" id="newExReps" min="1" max="300" value="10" class="w-full bg-bgCard border border-borderDark rounded-xl px-2.5 py-2 text-xs font-bold text-orange-400 mono text-center focus:outline-none focus:border-orange-500" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">Lest cible (kg)</label>
+                    <input type="number" id="newExWeight" min="0" max="150" step="0.5" value="0" class="w-full bg-bgCard border border-borderDark rounded-xl px-2.5 py-2 text-xs font-bold text-sky-400 mono text-center focus:outline-none focus:border-orange-500" />
+                  </div>
                 </div>
-                <div class="sm:col-span-2">
-                  <label class="block text-[11px] text-slate-400 mb-1">Reps / Série</label>
-                  <input type="number" id="newExReps" min="1" max="300" value="10" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white mono focus:outline-none focus:border-orange-500" />
+
+                <div class="flex justify-end">
+                  <button onclick="addExerciseToRoutine()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-xs font-bold text-white flex items-center justify-center gap-1.5 transition">
+                    <i data-lucide="Plus" class="w-4 h-4"></i>
+                    <span>Ajouter à ma routine</span>
+                  </button>
                 </div>
-                <div class="sm:col-span-3">
-                  <label class="block text-[11px] text-slate-400 mb-1">Lest cible (kg)</label>
-                  <input type="number" id="newExWeight" min="0" max="150" step="0.5" value="0" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white mono focus:outline-none focus:border-orange-500" />
-                </div>
-              </div>
-              <div class="flex justify-end pt-1">
-                <button onclick="addExerciseToRoutine()" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-xs font-bold text-white flex items-center gap-1.5 transition">
-                  <i data-lucide="Plus" class="w-4 h-4"></i>
-                  Ajouter à ma routine
-                </button>
               </div>
             </div>
 
-            <div class="space-y-2.5" id="builderExercisesList"></div>
+            <div class="space-y-3" id="builderExercisesList"></div>
           </div>
 
           <!-- TAB 3: TEST DE MAX / HORS ROUTINE -->
-          <div id="viewMaxLogger" class="p-5 space-y-5 hidden">
+          <div id="viewMaxLogger" class="p-3.5 sm:p-5 space-y-4 hidden">
             <div class="bg-purple-500/10 border border-purple-500/25 rounded-xl p-3.5 flex items-start gap-3">
               <i data-lucide="Zap" class="w-5 h-5 text-purple-400 shrink-0 mt-0.5"></i>
               <div class="text-xs text-slate-300 leading-relaxed">
@@ -315,47 +347,47 @@
               </div>
             </div>
 
-            <div class="bg-bgMain border border-borderDark rounded-xl p-4 space-y-4">
+            <div class="bg-bgMain border border-borderDark rounded-xl p-3.5 sm:p-4 space-y-4">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
+                <div class="min-w-0">
                   <label class="block text-[11px] text-slate-400 mb-1">Exercice ou Figure</label>
-                  <select id="maxExerciseSelect" onchange="toggleMaxCustomInput()" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-purple-500">
+                  <select id="maxExerciseSelect" onchange="toggleMaxCustomInput()" class="w-full min-w-0 bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-purple-500">
                   </select>
-                  <input type="text" id="maxCustomExName" placeholder="Nom de l'exercice..." class="hidden mt-2 w-full bg-bgCard border border-purple-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none" />
+                  <input type="text" id="maxCustomExName" placeholder="Nom de l'exercice..." class="hidden mt-2 w-full bg-bgCard border border-purple-500/50 rounded-xl px-3 py-2 text-xs text-white focus:outline-none" />
                 </div>
                 <div>
                   <label class="block text-[11px] text-slate-400 mb-1">Date du test</label>
-                  <input type="date" id="maxDateInput" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-purple-500" />
+                  <input type="date" id="maxDateInput" class="w-full bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-purple-500" />
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="grid grid-cols-3 gap-2.5">
                 <div>
-                  <label class="block text-[11px] text-slate-400 mb-1">Performance Max (Reps ou Sec)</label>
-                  <input type="number" id="maxValueInput" min="1" max="1000" value="15" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-sm font-extrabold text-purple-400 mono focus:outline-none focus:border-purple-500" />
+                  <label class="block text-[11px] text-slate-400 mb-1 truncate">Score Max</label>
+                  <input type="number" id="maxValueInput" min="1" max="1000" value="15" class="w-full bg-bgCard border border-borderDark rounded-xl px-2.5 py-2 text-sm font-extrabold text-purple-400 mono text-center focus:outline-none focus:border-purple-500" />
                 </div>
                 <div>
-                  <label class="block text-[11px] text-slate-400 mb-1">Unité</label>
-                  <select id="maxUnitSelect" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-purple-500">
-                    <option value="reps">Répétitions (Reps)</option>
-                    <option value="sec">Secondes (Maintien statique)</option>
+                  <label class="block text-[11px] text-slate-400 mb-1 truncate">Unité</label>
+                  <select id="maxUnitSelect" class="w-full bg-bgCard border border-borderDark rounded-xl px-2 py-2 text-xs font-semibold text-white focus:outline-none focus:border-purple-500">
+                    <option value="reps">Reps</option>
+                    <option value="sec">Secondes</option>
                   </select>
                 </div>
                 <div>
-                  <label class="block text-[11px] text-slate-400 mb-1">Lest ajouté (kg)</label>
-                  <input type="number" id="maxWeightInput" min="0" max="200" step="0.5" value="0" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-sm font-bold text-sky-400 mono focus:outline-none focus:border-purple-500" />
+                  <label class="block text-[11px] text-slate-400 mb-1 truncate">Lest (kg)</label>
+                  <input type="number" id="maxWeightInput" min="0" max="200" step="0.5" value="0" class="w-full bg-bgCard border border-borderDark rounded-xl px-2.5 py-2 text-sm font-bold text-sky-400 mono text-center focus:outline-none focus:border-purple-500" />
                 </div>
               </div>
 
               <div>
                 <label class="block text-[11px] text-slate-400 mb-1">Note (optionnel)</label>
-                <input type="text" id="maxNoteInput" placeholder="Ex: Testé à frais, exécution stricte..." class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500" />
+                <input type="text" id="maxNoteInput" placeholder="Ex: Testé à frais, exécution stricte..." class="w-full bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500" />
               </div>
 
               <div class="flex justify-end">
-                <button onclick="saveMaxRecord()" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/25 flex items-center gap-2 transition">
+                <button onclick="saveMaxRecord()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/25 flex items-center justify-center gap-2 transition">
                   <i data-lucide="Trophy" class="w-4 h-4"></i>
-                  Enregistrer ce Max Hors Routine
+                  <span>Enregistrer ce Max Hors Routine</span>
                 </button>
               </div>
             </div>
@@ -363,25 +395,25 @@
         </div>
 
         <!-- CARD 2: OBJECTIFS DE FIGURES & SKILLS -->
-        <div class="bg-bgCard border border-borderDark rounded-2xl p-5 space-y-4 shadow-xl">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h2 class="text-base font-bold text-white flex items-center gap-2">
-                <i data-lucide="Sparkles" class="w-4 h-4 text-purple-400"></i>
-                Objectifs de Figures & Skills (Street Workout)
+        <div class="bg-bgCard border border-borderDark rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl">
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="Sparkles" class="w-4 h-4 text-purple-400 shrink-0"></i>
+                <span class="truncate">Objectifs de Figures & Skills</span>
               </h2>
-              <p class="text-xs text-slate-400">Suis tes figures statiques et dynamiques par variante (Tuck, Adv. Tuck, Straddle, Full)</p>
+              <p class="text-xs text-slate-400 truncate">Suis tes figures par variante (Tuck, Adv. Tuck, Straddle, Full)</p>
             </div>
-            <button onclick="toggleNewSkillForm()" class="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 text-xs font-bold flex items-center gap-1.5 transition">
+            <button onclick="toggleNewSkillForm()" class="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 text-xs font-bold flex items-center gap-1 shrink-0 transition">
               <i data-lucide="Plus" class="w-3.5 h-3.5"></i>
-              + Figure
+              <span>Figure</span>
             </button>
           </div>
 
-          <div id="newSkillForm" class="hidden bg-bgMain border border-purple-500/30 rounded-xl p-4 space-y-3">
+          <div id="newSkillForm" class="hidden bg-bgMain border border-purple-500/30 rounded-xl p-3.5 space-y-3">
             <h3 class="text-xs font-bold uppercase text-purple-400">Ajouter un objectif de figure</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-              <div class="sm:col-span-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
                 <label class="block text-[11px] text-slate-400 mb-1">Figure</label>
                 <select id="skillNameSelect" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs font-semibold text-white">
                   <option value="Muscle-Up Barre">Muscle-Up Barre</option>
@@ -395,7 +427,7 @@
                   <option value="Pistol Squat">Pistol Squat</option>
                 </select>
               </div>
-              <div class="sm:col-span-3">
+              <div>
                 <label class="block text-[11px] text-slate-400 mb-1">Variante actuelle</label>
                 <select id="skillVariantSelect" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs font-semibold text-white">
                   <option value="Tuck">Tuck</option>
@@ -407,20 +439,22 @@
                   <option value="Élastique">Avec Élastique</option>
                 </select>
               </div>
-              <div class="sm:col-span-3">
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
                 <label class="block text-[11px] text-slate-400 mb-1">Objectif (Sec ou Reps)</label>
                 <input type="number" id="skillTargetInput" min="1" max="300" value="10" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs font-bold text-white mono" />
               </div>
-              <div class="sm:col-span-2">
+              <div>
                 <label class="block text-[11px] text-slate-400 mb-1">Unité</label>
                 <select id="skillUnitSelect" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs font-semibold text-white">
-                  <option value="sec">sec</option>
-                  <option value="reps">reps</option>
+                  <option value="sec">Secondes (sec)</option>
+                  <option value="reps">Répétitions (reps)</option>
                 </select>
               </div>
             </div>
-            <div class="flex justify-end gap-2">
-              <button onclick="addNewSkillGoal()" class="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-bold text-white">Ajouter la figure</button>
+            <div class="flex justify-end">
+              <button onclick="addNewSkillGoal()" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-bold text-white">Ajouter la figure</button>
             </div>
           </div>
 
@@ -430,28 +464,28 @@
       </div>
 
       <!-- RIGHT COLUMN (5 COLS): CHART, PRs & HISTORY -->
-      <div class="lg:col-span-5 space-y-6">
+      <div class="lg:col-span-5 space-y-5 sm:space-y-6 min-w-0">
 
         <!-- CHART.JS PROGRESSION -->
-        <div class="bg-bgCard border border-borderDark rounded-2xl p-5 space-y-4 shadow-xl">
+        <div class="bg-bgCard border border-borderDark rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl">
           <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <i data-lucide="TrendingUp" class="w-4 h-4 text-orange-400"></i>
-              Graphique de Progression
+            <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="TrendingUp" class="w-4 h-4 text-orange-400 shrink-0"></i>
+              <span>Graphique de Progression</span>
             </h2>
             <p class="text-xs text-slate-400">Évolution de tes répétitions réussies, objectifs et tests de Max</p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <div>
+            <div class="min-w-0">
               <label class="block text-[11px] text-slate-400 mb-1">Exercice suivi</label>
-              <select id="chartExerciseFilter" onchange="updateProgressionChart()" class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-orange-500">
+              <select id="chartExerciseFilter" onchange="updateProgressionChart()" class="w-full min-w-0 bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white truncate focus:outline-none focus:border-orange-500">
                 <option value="__ALL__">Toute la séance (Total Reps)</option>
               </select>
             </div>
-            <div>
+            <div class="min-w-0">
               <label class="block text-[11px] text-slate-400 mb-1">Indicateur</label>
-              <select id="chartMetricFilter" onchange="updateProgressionChart()" class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-orange-500">
+              <select id="chartMetricFilter" onchange="updateProgressionChart()" class="w-full min-w-0 bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white truncate focus:outline-none focus:border-orange-500">
                 <option value="totalReps">Volume Total : Réussi vs Objectif</option>
                 <option value="maxReps">Max sur 1 Série (inclut Hors Routine)</option>
                 <option value="completionRate">Taux de réussite (%)</option>
@@ -459,29 +493,29 @@
             </div>
           </div>
 
-          <div class="bg-bgMain border border-borderDark rounded-xl p-3 h-64 relative">
+          <div class="bg-bgMain border border-borderDark rounded-xl p-2.5 sm:p-3 h-60 sm:h-64 relative w-full">
             <canvas id="progressionChart"></canvas>
           </div>
         </div>
 
         <!-- PERSONAL RECORDS (PR) -->
-        <div class="bg-bgCard border border-borderDark rounded-2xl p-5 space-y-3">
-          <div class="flex items-center justify-between">
+        <div class="bg-bgCard border border-borderDark rounded-2xl p-4 sm:p-5 space-y-3">
+          <div class="flex items-center justify-between gap-2">
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i data-lucide="Award" class="w-4 h-4 text-amber-400"></i>
-              Records Personnels (PR)
+              <i data-lucide="Award" class="w-4 h-4 text-amber-400 shrink-0"></i>
+              <span>Records Personnels (PR)</span>
             </h3>
-            <span class="text-[11px] text-slate-400">Séances + Tests de Max</span>
+            <span class="text-[11px] text-slate-400 shrink-0">Séances + Max</span>
           </div>
           <div id="prGridContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
         </div>
 
         <!-- SESSION & MAX HISTORY -->
-        <div class="bg-bgCard border border-borderDark rounded-2xl p-5 space-y-3">
+        <div class="bg-bgCard border border-borderDark rounded-2xl p-4 sm:p-5 space-y-3">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i data-lucide="History" class="w-4 h-4 text-sky-400"></i>
-              Historique (Séances & Max)
+              <i data-lucide="History" class="w-4 h-4 text-sky-400 shrink-0"></i>
+              <span>Historique (Séances & Max)</span>
             </h3>
             <span id="historyCountBadge" class="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 mono">0</span>
           </div>
@@ -493,57 +527,55 @@
   </main>
 
   <!-- DATABASE & SYNC MODAL -->
-  <div id="syncModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-bgCard border border-borderDark rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+  <div id="syncModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-3 sm:p-4">
+    <div class="bg-bgCard border border-borderDark rounded-2xl max-w-xl w-full p-4 sm:p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-borderDark pb-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 shrink-0 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400">
             <i data-lucide="Database" class="w-5 h-5"></i>
           </div>
-          <div>
-            <h3 class="text-base font-bold text-white">Base de Données Cloud Temps Réel</h3>
-            <p class="text-xs text-slate-400">Connecté à calisthenics-pro-623db</p>
+          <div class="min-w-0">
+            <h3 class="text-sm sm:text-base font-bold text-white truncate">Base de Données Cloud Temps Réel</h3>
+            <p class="text-xs text-slate-400 truncate">Connecté à calisthenics-pro-623db</p>
           </div>
         </div>
-        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white p-1">
+        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white p-1 shrink-0">
           <i data-lucide="X" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <!-- FIREBASE REALTIME DATABASE URL -->
-      <div class="bg-bgMain border border-sky-500/30 rounded-xl p-4 space-y-3">
+      <div class="bg-bgMain border border-sky-500/30 rounded-xl p-3.5 sm:p-4 space-y-3">
         <div class="flex items-center justify-between">
           <h4 class="text-xs font-bold uppercase text-sky-400">URL Firebase Realtime Database</h4>
           <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300">Préconfiguré</span>
         </div>
-        <input type="url" id="cloudEndpointInput" value="https://calisthenics-pro-623db-default-rtdb.europe-west1.firebasedatabase.app" class="w-full bg-bgCard border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500" />
+        <input type="url" id="cloudEndpointInput" value="https://calisthenics-pro-623db-default-rtdb.europe-west1.firebasedatabase.app" class="w-full bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500" />
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <input type="text" id="cloudUserKeyInput" value="mathis_sw" placeholder="Identifiant (mathis_sw)" class="bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono" />
           <button onclick="connectAndPullCloud()" class="py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
             <i data-lucide="RefreshCw" class="w-3.5 h-3.5"></i>
-            Charger du Cloud
+            <span>Charger du Cloud</span>
           </button>
           <button onclick="pushToCloud(true)" class="py-2 px-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
             <i data-lucide="UploadCloud" class="w-3.5 h-3.5"></i>
-            Forcer l'envoi Cloud
+            <span>Forcer l'envoi</span>
           </button>
         </div>
         <div class="bg-slate-900 border border-borderDark rounded-lg p-3 text-[11px] text-slate-300 space-y-1">
-          <p class="font-bold text-amber-400">Si tu vois "Erreur Cloud (401 Permission Denied)" :</p>
+          <p class="font-bold text-amber-400">Si tu vois "Erreur Cloud (401)" :</p>
           <p>Va sur Firebase &gt; <strong>Realtime Database</strong> &gt; onglet <strong>Règles (Rules)</strong> et publie :</p>
           <pre class="bg-black/50 p-2 rounded text-emerald-400 mono text-[10px] overflow-x-auto">{ "rules": { ".read": true, ".write": true } }</pre>
         </div>
       </div>
 
-      <!-- EXPORT / IMPORT JSON -->
       <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-borderDark">
-        <span class="text-xs text-slate-400">Sauvegarde fichier de secours (.JSON) :</span>
+        <span class="text-xs text-slate-400">Sauvegarde fichier (.JSON) :</span>
         <div class="flex items-center gap-2">
           <button onclick="exportDataJson()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-            <i data-lucide="Download" class="w-3.5 h-3.5 text-orange-400"></i> Exporter .JSON
+            <i data-lucide="Download" class="w-3.5 h-3.5 text-orange-400"></i> Exporter
           </button>
           <label class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="Upload" class="w-3.5 h-3.5 text-emerald-400"></i> Importer .JSON
+            <i data-lucide="Upload" class="w-3.5 h-3.5 text-emerald-400"></i> Importer
             <input type="file" accept=".json" onchange="importDataJson(event)" class="hidden" />
           </label>
         </div>
@@ -554,9 +586,9 @@
   </div>
 
   <!-- TOAST -->
-  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-    <div class="bg-slate-900 border border-orange-500/40 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-semibold">
-      <i data-lucide="Sparkles" class="w-4 h-4 text-orange-400"></i>
+  <div id="toastNotification" class="fixed bottom-4 right-4 left-4 sm:left-auto z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-900 border border-orange-500/40 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center justify-center sm:justify-start gap-2.5 text-xs font-semibold">
+      <i data-lucide="Sparkles" class="w-4 h-4 text-orange-400 shrink-0"></i>
       <span id="toastText">Sauvegardé</span>
     </div>
   </div>
@@ -680,7 +712,6 @@
     let chartInstance = null;
     let pushDebounceTimer = null;
 
-    // Timer variables
     let timerMode = 'rest';
     let timerSeconds = 90;
     let timerInterval = null;
@@ -713,22 +744,26 @@
     function updateStatusIndicator(statusType, text) {
       const badge = document.getElementById('saveIndicatorBadge');
       const dot = document.getElementById('cloudStatusDot');
+      const dotMob = document.getElementById('cloudStatusDotMobile');
       const btnLabel = document.getElementById('cloudBtnLabel');
 
       if (statusType === 'cloud_ok') {
-        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+        badge.className = 'text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 truncate';
         badge.textContent = text || '☁️ Synchronisé Cloud';
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
-        btnLabel.textContent = 'Cloud Connecté';
+        if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+        if (dotMob) dotMob.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        if (btnLabel) btnLabel.textContent = 'Cloud Connecté';
       } else if (statusType === 'syncing') {
-        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/30';
+        badge.className = 'text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/30 truncate';
         badge.textContent = text || '↻ Synchronisation...';
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse';
+        if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse';
+        if (dotMob) dotMob.className = 'w-2 h-2 rounded-full bg-sky-400 animate-pulse';
       } else {
-        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30';
+        badge.className = 'text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 truncate';
         badge.textContent = text || '⚠️ Erreur Cloud';
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
-        btnLabel.textContent = 'Vérifier Règles Cloud';
+        if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+        if (dotMob) dotMob.className = 'w-2 h-2 rounded-full bg-rose-400';
+        if (btnLabel) btnLabel.textContent = 'Vérifier Règles Cloud';
       }
     }
 
@@ -774,12 +809,12 @@
       const rulesAlert = document.getElementById('firebaseRulesAlert');
       if (!cfg.endpoint) return;
 
-      updateStatusIndicator('syncing', '↻ Synchronisation Cloud...');
+      updateStatusIndicator('syncing', '↻ Sync Cloud...');
       try {
         const res = await fetch(buildFirebaseRestEndpoint(cfg), { cache: 'no-store' });
         if (res.status === 401 || res.status === 403) {
           rulesAlert.classList.remove('hidden');
-          updateStatusIndicator('error', '⚠️ Règles Firebase verrouillées (401)');
+          updateStatusIndicator('error', '⚠️ Règles Firebase verrouillées');
           return;
         }
         if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -792,13 +827,12 @@
           initSessionDraftFromRoutine(false);
           refreshAllDashboardViews();
           const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-          updateStatusIndicator('cloud_ok', `☁️ Synchronisé Cloud • ${now}`);
+          updateStatusIndicator('cloud_ok', `☁️ Synchronisé • ${now}`);
         } else {
-          // Base vide au premier lancement : on envoie l'état initial
           await pushToCloud(false);
         }
       } catch (e) {
-        updateStatusIndicator('error', '⚠️ Erreur Cloud (Vérifie Règles Firebase)');
+        updateStatusIndicator('error', '⚠️ Erreur Cloud');
       }
     }
 
@@ -819,15 +853,15 @@
         });
         if (res.status === 401 || res.status === 403) {
           rulesAlert.classList.remove('hidden');
-          updateStatusIndicator('error', '⚠️ Règles Firebase verrouillées (401)');
-          if (verbose && msg) msg.textContent = 'Accès refusé (401) : publie { "rules": { ".read": true, ".write": true } } dans l’onglet Règles de Firebase.';
+          updateStatusIndicator('error', '⚠️ Règles Firebase verrouillées');
+          if (verbose && msg) msg.textContent = 'Accès refusé (401) : publie { "rules": { ".read": true, ".write": true } } dans Firebase.';
           return;
         }
         if (!res.ok) throw new Error('HTTP ' + res.status);
         rulesAlert.classList.add('hidden');
 
-        const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        updateStatusIndicator('cloud_ok', `☁️ Synchronisé Cloud • ${now}`);
+        const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        updateStatusIndicator('cloud_ok', `☁️ Synchronisé • ${now}`);
         if (verbose && msg) {
           msg.textContent = '✓ Base de données Cloud mise à jour avec succès !';
           showToast('Synchronisé dans le Cloud !');
@@ -877,7 +911,7 @@
 
     function buildExerciseSelectHtml(selectedName, exIdx, handlerName = 'handleBuilderRowExerciseChange') {
       let foundInCatalog = false;
-      let html = `<select onchange="${handlerName}(${exIdx}, this.value)" class="bg-bgMain border border-borderDark rounded-lg px-2.5 py-1 text-xs font-bold text-white focus:outline-none focus:border-orange-500 max-w-[230px] truncate">`;
+      let html = `<select onchange="${handlerName}(${exIdx}, this.value)" class="flex-1 w-full min-w-0 bg-bgMain border border-borderDark rounded-xl px-2.5 py-1.5 text-xs sm:text-sm font-bold text-white truncate focus:outline-none focus:border-orange-500">`;
       EXERCISE_CATALOG.forEach(group => {
         html += `<optgroup label="${group.category}">`;
         group.items.forEach(item => {
@@ -1029,9 +1063,9 @@
       const bBuilder = document.getElementById('tabBtnBuilder');
       const bMax = document.getElementById('tabBtnMax');
 
-      const inactiveClass = 'py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition';
-      const activeOrange = 'py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-orange-500 text-orange-400 bg-orange-500/5 transition';
-      const activePurple = 'py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-purple-500 text-purple-400 bg-purple-500/5 transition';
+      const inactiveClass = 'py-3 px-1.5 sm:px-3 text-[11px] sm:text-sm font-bold flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition';
+      const activeOrange = 'py-3 px-1.5 sm:px-3 text-[11px] sm:text-sm font-bold flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 border-b-2 border-orange-500 text-orange-400 bg-orange-500/5 transition';
+      const activePurple = 'py-3 px-1.5 sm:px-3 text-[11px] sm:text-sm font-bold flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 border-b-2 border-purple-500 text-purple-400 bg-purple-500/5 transition';
 
       vSession.classList.add('hidden');
       vBuilder.classList.add('hidden');
@@ -1058,7 +1092,7 @@
       lucide.createIcons();
     }
 
-    // TAB 1: SESSION LOGGING (WITH ON-THE-FLY SWAP & BONUS EXERCISES)
+    // TAB 1: SESSION LOGGING (CLEAN 2-ROW HEADER TO PREVENT OVERLAP)
     function renderSessionLoggingView() {
       const container = document.getElementById('sessionExercisesContainer');
       container.innerHTML = '';
@@ -1094,37 +1128,46 @@
         }).join('');
 
         const card = document.createElement('div');
-        card.className = `bg-slate-900/60 border ${ex.isBonus ? 'border-sky-500/40' : 'border-borderDark'} rounded-2xl p-4 space-y-3`;
+        card.className = `bg-slate-900/60 border ${ex.isBonus ? 'border-sky-500/40' : 'border-borderDark'} rounded-2xl p-3.5 sm:p-4 space-y-3`;
         card.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="w-6 h-6 rounded-lg ${ex.isBonus ? 'bg-sky-500/20 text-sky-400' : 'bg-orange-500/15 text-orange-400'} font-bold text-xs flex items-center justify-center mono">${exIdx + 1}</span>
-              ${buildExerciseSelectHtml(ex.name, exIdx, 'handleDraftExerciseSwap')}
-              <span class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 mono">
+          <!-- Header Row 1: Number + Full-Width Select + Remove Button -->
+          <div class="flex items-center gap-2 w-full min-w-0">
+            <span class="w-6 h-6 shrink-0 rounded-lg ${ex.isBonus ? 'bg-sky-500/20 text-sky-400' : 'bg-orange-500/15 text-orange-400'} font-bold text-xs flex items-center justify-center mono">${exIdx + 1}</span>
+            ${buildExerciseSelectHtml(ex.name, exIdx, 'handleDraftExerciseSwap')}
+            <button onclick="removeExerciseFromTodayDraft(${exIdx})" class="p-1.5 shrink-0 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Retirer cet exercice aujourd'hui">
+              <i data-lucide="X" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Header Row 2: Badges on Left + Score & 100% button on Right -->
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 mono text-[11px]">
                 Obj : ${ex.targetSets} × ${ex.targetReps} ${ex.targetWeight > 0 ? '(+' + ex.targetWeight + 'kg)' : ''}
               </span>
-              ${ex.isBonus ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">+ Bonus du jour</span>` : ''}
-              ${!ex.isBonus && allSetsValidated && appState.autoLevelUp ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">🔥 Level-Up prêt</span>` : ''}
+              ${ex.isBonus ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">+ Bonus</span>` : ''}
+              ${!ex.isBonus && allSetsValidated && appState.autoLevelUp ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">🔥 Level-Up</span>` : ''}
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 ml-auto">
               <span id="exSummary_${exIdx}" class="mono text-xs font-bold text-white">${achievedTotal}/${targetTotal} (${pct}%)</span>
-              <button onclick="setExerciseFullTarget(${exIdx})" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-emerald-500/20 text-[11px] font-semibold text-slate-300 hover:text-emerald-300 transition">100%</button>
-              <button onclick="removeExerciseFromTodayDraft(${exIdx})" class="p-1 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Retirer cet exercice de la séance d'aujourd'hui">
-                <i data-lucide="X" class="w-3.5 h-3.5"></i>
-              </button>
+              <button onclick="setExerciseFullTarget(${exIdx})" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-[11px] font-bold text-emerald-300 transition">100%</button>
             </div>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
+
+          <!-- Sets Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2">
             ${setsHtml}
           </div>
+
+          <!-- Footer Row: Weight + Add/Remove Set -->
           <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-slate-400">
             <div class="flex items-center gap-2">
-              <span>Lest réalisé (kg) :</span>
-              <input type="number" step="0.5" min="0" value="${ex.actualWeight}" oninput="updateDraftWeight(${exIdx}, this.value)" class="w-20 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs text-white mono" />
+              <span>Lest (kg) :</span>
+              <input type="number" step="0.5" min="0" value="${ex.actualWeight}" oninput="updateDraftWeight(${exIdx}, this.value)" class="w-16 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs text-white mono text-center" />
             </div>
             <div class="flex items-center gap-1.5">
-              <button onclick="addExtraSetToDraft(${exIdx})" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300">+ 1 série</button>
-              <button onclick="removeLastSetFromDraft(${exIdx})" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-400">- 1 série</button>
+              <button onclick="addExtraSetToDraft(${exIdx})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-300">+ 1 série</button>
+              <button onclick="removeLastSetFromDraft(${exIdx})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-400">- 1 série</button>
             </div>
           </div>
         `;
@@ -1296,7 +1339,7 @@
       }
     }
 
-    // TAB 2: ROUTINE BUILDER
+    // TAB 2: ROUTINE BUILDER (RESPONSIVE 2-ROW CARDS)
     function renderRoutineBuilderView() {
       const routine = getActiveRoutine();
       const list = document.getElementById('builderExercisesList');
@@ -1309,28 +1352,31 @@
 
       routine.exercises.forEach((ex, idx) => {
         const row = document.createElement('div');
-        row.className = 'bg-slate-900/60 border border-borderDark rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3';
+        row.className = 'bg-slate-900/60 border border-borderDark rounded-xl p-3.5 space-y-3';
         row.innerHTML = `
-          <div class="flex items-center gap-2 flex-1 min-w-[210px]">
-            <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center mono">${idx + 1}</span>
+          <!-- Line 1: Index + Exercise Dropdown + Delete -->
+          <div class="flex items-center gap-2 w-full min-w-0">
+            <span class="w-6 h-6 shrink-0 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center mono">${idx + 1}</span>
             ${buildExerciseSelectHtml(ex.name, idx, 'handleBuilderRowExerciseChange')}
-          </div>
-          <div class="flex flex-wrap items-center gap-3">
-            <div class="flex items-center gap-1.5">
-              <label class="text-[11px] text-slate-400">Séries :</label>
-              <input type="number" min="1" max="20" value="${ex.targetSets}" oninput="updateRoutineExerciseField(${idx}, 'targetSets', this.value)" class="w-14 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs font-bold text-white mono text-center" />
-            </div>
-            <div class="flex items-center gap-1.5">
-              <label class="text-[11px] text-slate-400">Reps :</label>
-              <input type="number" min="1" max="300" value="${ex.targetReps}" oninput="updateRoutineExerciseField(${idx}, 'targetReps', this.value)" class="w-16 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs font-bold text-orange-400 mono text-center" />
-            </div>
-            <div class="flex items-center gap-1.5">
-              <label class="text-[11px] text-slate-400">Lest (kg) :</label>
-              <input type="number" min="0" step="0.5" value="${ex.targetWeight || 0}" oninput="updateRoutineExerciseField(${idx}, 'targetWeight', this.value)" class="w-16 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs font-bold text-sky-400 mono text-center" />
-            </div>
-            <button onclick="removeExerciseFromRoutine(${idx})" class="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition">
+            <button onclick="removeExerciseFromRoutine(${idx})" class="p-1.5 shrink-0 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Supprimer de la routine">
               <i data-lucide="Trash" class="w-4 h-4"></i>
             </button>
+          </div>
+
+          <!-- Line 2: 3 Clean Columns for Sets, Reps, Weight -->
+          <div class="grid grid-cols-3 gap-2.5">
+            <div class="bg-bgMain border border-borderDark rounded-lg p-2 flex flex-col items-center">
+              <label class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Séries</label>
+              <input type="number" min="1" max="20" value="${ex.targetSets}" oninput="updateRoutineExerciseField(${idx}, 'targetSets', this.value)" class="w-full bg-bgCard border border-borderDark rounded py-1 text-xs font-bold text-white mono text-center" />
+            </div>
+            <div class="bg-bgMain border border-borderDark rounded-lg p-2 flex flex-col items-center">
+              <label class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Reps / Série</label>
+              <input type="number" min="1" max="300" value="${ex.targetReps}" oninput="updateRoutineExerciseField(${idx}, 'targetReps', this.value)" class="w-full bg-bgCard border border-borderDark rounded py-1 text-xs font-bold text-orange-400 mono text-center" />
+            </div>
+            <div class="bg-bgMain border border-borderDark rounded-lg p-2 flex flex-col items-center">
+              <label class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Lest (kg)</label>
+              <input type="number" min="0" step="0.5" value="${ex.targetWeight || 0}" oninput="updateRoutineExerciseField(${idx}, 'targetWeight', this.value)" class="w-full bg-bgCard border border-borderDark rounded py-1 text-xs font-bold text-sky-400 mono text-center" />
+            </div>
           </div>
         `;
         list.appendChild(row);
@@ -1521,19 +1567,19 @@
         const varOptions = variants.map(v => `<option value="${v}" ${sk.variant === v ? 'selected' : ''}>${v}</option>`).join('');
 
         const card = document.createElement('div');
-        card.className = `bg-bgMain border ${done ? 'border-emerald-500/40' : 'border-borderDark'} rounded-xl p-3.5 space-y-2.5`;
+        card.className = `bg-bgMain border ${done ? 'border-emerald-500/40' : 'border-borderDark'} rounded-xl p-3.5 space-y-2.5 min-w-0`;
         card.innerHTML = `
           <div class="flex items-start justify-between gap-2">
-            <div>
-              <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
-                <span>${sk.name}</span>
-                ${done ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Validé</span>` : ''}
+            <div class="min-w-0 flex-1">
+              <h4 class="text-xs font-bold text-white flex items-center gap-1.5 flex-wrap">
+                <span class="truncate">${sk.name}</span>
+                ${done ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 shrink-0">Validé</span>` : ''}
               </h4>
-              <select onchange="updateSkillVariant(${idx}, this.value)" class="mt-1 bg-bgCard border border-borderDark rounded px-2 py-0.5 text-[11px] text-purple-300 font-semibold">
+              <select onchange="updateSkillVariant(${idx}, this.value)" class="mt-1.5 w-full bg-bgCard border border-borderDark rounded-lg px-2 py-1 text-[11px] text-purple-300 font-semibold">
                 ${varOptions}
               </select>
             </div>
-            <button onclick="deleteSkill(${idx})" class="text-slate-500 hover:text-rose-400">
+            <button onclick="deleteSkill(${idx})" class="text-slate-500 hover:text-rose-400 p-1 shrink-0">
               <i data-lucide="X" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -1548,13 +1594,13 @@
             </div>
           </div>
 
-          <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center justify-between pt-1 gap-2">
             <div class="flex items-center gap-1">
-              <button onclick="adjustSkillProgress(${idx}, -1)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 mono">-1</button>
-              <button onclick="adjustSkillProgress(${idx}, 1)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-xs text-white mono">+1</button>
-              <button onclick="adjustSkillProgress(${idx}, 5)" class="px-2 py-0.5 rounded bg-purple-500/20 hover:bg-purple-500/30 text-xs text-purple-300 mono">+5</button>
+              <button onclick="adjustSkillProgress(${idx}, -1)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 mono">-1</button>
+              <button onclick="adjustSkillProgress(${idx}, 1)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-white mono">+1</button>
+              <button onclick="adjustSkillProgress(${idx}, 5)" class="px-2 py-1 rounded bg-purple-500/20 hover:bg-purple-500/30 text-xs text-purple-300 mono">+5</button>
             </div>
-            <button onclick="adjustSkillProgress(${idx}, ${sk.target - sk.current})" class="text-[11px] font-semibold text-emerald-400 hover:underline">Valider Obj</button>
+            <button onclick="adjustSkillProgress(${idx}, ${sk.target - sk.current})" class="text-[11px] font-bold text-emerald-400 hover:underline shrink-0">Valider Obj</button>
           </div>
         `;
         container.appendChild(card);
@@ -1634,13 +1680,13 @@
       prGrid.innerHTML = '';
       entries.forEach(([name, stats]) => {
         const d = document.createElement('div');
-        d.className = 'bg-bgMain border border-borderDark rounded-xl p-3 flex items-center justify-between';
+        d.className = 'bg-bgMain border border-borderDark rounded-xl p-3 flex items-center justify-between gap-2 min-w-0';
         d.innerHTML = `
-          <div>
-            <p class="text-xs font-bold text-white truncate max-w-[135px]">${name}</p>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-bold text-white truncate" title="${name}">${name}</p>
             <p class="text-[11px] text-slate-400">Vol. max : <span class="text-slate-200 mono">${stats.maxVolume}</span></p>
           </div>
-          <div class="text-right">
+          <div class="text-right shrink-0">
             <span class="px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-extrabold mono">
               ${stats.maxSingleSet} ${stats.unit}
             </span>
@@ -1670,13 +1716,13 @@
           const exT = ex.targetSets * ex.targetReps;
           const exD = ex.achievedSets.reduce((a, b) => a + (Number(b) || 0), 0);
           return `
-            <div class="flex items-center justify-between text-[11px] py-1 border-b border-slate-800/60 last:border-none">
-              <span class="text-slate-300">
+            <div class="flex items-center justify-between gap-2 text-[11px] py-1 border-b border-slate-800/60 last:border-none min-w-0">
+              <span class="text-slate-300 truncate">
                 ${ex.name}
                 ${ex.isBonus ? `<span class="text-[10px] text-sky-400 font-semibold">(+Bonus)</span>` : ''}
                 ${ex.actualWeight > 0 ? `<strong class="text-sky-400">(+${ex.actualWeight}kg)</strong>` : ''}
               </span>
-              <span class="mono font-semibold text-white">
+              <span class="mono font-semibold text-white shrink-0">
                 ${isMax ? `<strong class="text-purple-400">MAX : ${exD}${ex.unit || 'reps'}</strong>` : `[${ex.achievedSets.join('-')}] = <strong class="${exD >= exT ? 'text-emerald-400' : 'text-orange-400'}">${exD}/${exT}</strong>`}
               </span>
             </div>
@@ -1684,16 +1730,16 @@
         }).join('');
 
         const item = document.createElement('div');
-        item.className = `bg-bgMain border ${isMax ? 'border-purple-500/30' : 'border-borderDark'} rounded-xl p-3.5 space-y-2`;
+        item.className = `bg-bgMain border ${isMax ? 'border-purple-500/30' : 'border-borderDark'} rounded-xl p-3.5 space-y-2 min-w-0`;
         item.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold ${isMax ? 'text-purple-400' : 'text-white'}">${sess.routineName}</span>
-              <span class="text-[11px] text-slate-400 mono">${sess.date}</span>
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-xs font-bold ${isMax ? 'text-purple-400' : 'text-white'} truncate">${sess.routineName}</span>
+              <span class="text-[11px] text-slate-400 mono shrink-0">${sess.date}</span>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0">
               ${isMax
-                ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/15 text-purple-300">Max Hors Routine</span>`
+                ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/15 text-purple-300">Max</span>`
                 : `<span class="text-xs font-extrabold mono px-2 py-0.5 rounded ${pct >= 100 ? 'bg-emerald-500/15 text-emerald-400' : 'bg-orange-500/15 text-orange-400'}">${pct}%</span>`
               }
               <button onclick="deleteSessionById('${sess.id}')" class="text-slate-500 hover:text-rose-400">
@@ -1702,7 +1748,7 @@
             </div>
           </div>
           <div>${details}</div>
-          ${sess.note ? `<p class="text-[11px] text-slate-400 italic">"${sess.note}"</p>` : ''}
+          ${sess.note ? `<p class="text-[11px] text-slate-400 italic break-words">"${sess.note}"</p>` : ''}
         `;
         container.appendChild(item);
       });
@@ -1828,13 +1874,13 @@
       if (timerMode === 'rest') {
         timerSeconds = 90;
         modeBtn.textContent = 'Repos';
-        modeBtn.className = 'text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-orange-500/20 text-orange-400';
+        modeBtn.className = 'text-[10px] sm:text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 shrink-0';
         presets.classList.remove('hidden');
         sendBtn.classList.add('hidden');
       } else {
         timerSeconds = 0;
         modeBtn.textContent = 'Maintien';
-        modeBtn.className = 'text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-purple-500/20 text-purple-300';
+        modeBtn.className = 'text-[10px] sm:text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 shrink-0';
         presets.classList.add('hidden');
         sendBtn.classList.remove('hidden');
       }
@@ -1942,8 +1988,8 @@
     function showToast(text) {
       const t = document.getElementById('toastNotification');
       document.getElementById('toastText').textContent = text;
-      t.classList.remove('translate-y-20', 'opacity-0');
-      setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 3200);
+      t.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => t.classList.add('translate-y-24', 'opacity-0'), 3200);
     }
 
     function refreshAllDashboardViews() {
@@ -1959,7 +2005,6 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      // Force la mise à jour vers ton URL Firebase officielle
       localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({
         endpoint: FIREBASE_DB_URL,
         userKey: DEFAULT_USER_KEY
