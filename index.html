@@ -44,7 +44,7 @@
           <div class="flex items-center gap-2 flex-wrap">
             <h1 class="text-lg font-extrabold tracking-tight text-white">CALISTHENICS <span class="text-orange-500">PRO</span></h1>
             <span id="saveIndicatorBadge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">
-              Connexion base de données...
+              Connexion Cloud...
             </span>
           </div>
           <p class="text-xs text-slate-400">Synchronisation Temps Réel PC & Téléphone</p>
@@ -86,6 +86,15 @@
 
   <!-- MAIN CONTENT -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+
+    <!-- BANNER IF FIREBASE RULES ARE LOCKED -->
+    <div id="firebaseRulesAlert" class="hidden bg-rose-500/10 border border-rose-500/40 rounded-2xl p-4 text-xs text-rose-200 space-y-2">
+      <div class="flex items-center gap-2 font-bold text-rose-400 text-sm">
+        <i data-lucide="AlertTriangle" class="w-5 h-5"></i>
+        <span>Action requise sur ta console Firebase : Règles (Rules) verrouillées</span>
+      </div>
+      <p>Ta base <strong>calisthenics-pro-623db</strong> est bien trouvée, mais Firebase bloque l'écriture tant que les règles sont sur <code>false</code>. Va sur ta console Firebase &gt; onglet <strong>Règles (Rules)</strong>, colle <code>{ "rules": { ".read": true, ".write": true } }</code> et clique sur <strong>Publier</strong>.</p>
+    </div>
 
     <!-- KPI SUMMARY BAR -->
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -158,21 +167,28 @@
             </button>
           </div>
 
-          <!-- Routine Selector Bar -->
+          <!-- Routine Selector Bar (With DUPLICATE button) -->
           <div id="routineSelectorBar" class="p-4 bg-slate-900/30 border-b border-borderDark flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2 flex-1 min-w-[200px]">
               <label class="text-xs font-semibold text-slate-400 uppercase whitespace-nowrap">Routine :</label>
               <select id="activeRoutineSelect" onchange="handleRoutineChange()" class="flex-1 bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-sm font-semibold text-white focus:outline-none focus:border-orange-500">
               </select>
             </div>
-            <div class="flex items-center gap-2">
-              <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
+            <div class="flex items-center gap-2 flex-wrap">
+              <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700" title="Augmente automatiquement l'objectif (+1 rep) quand 100% des séries sont validées">
                 <input type="checkbox" id="autoLevelUpToggle" onchange="toggleAutoLevelUp(this.checked)" class="accent-orange-500 rounded" />
-                <span>Auto Level-Up (+1 rep)</span>
+                <span>Auto +1 rep</span>
               </label>
+              <button onclick="duplicateCurrentRoutine()" class="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-xs font-semibold text-sky-300 flex items-center gap-1 transition" title="Dupliquer cette routine pour créer une variante">
+                <i data-lucide="Copy" class="w-3.5 h-3.5"></i>
+                Dupliquer
+              </button>
               <button onclick="createNewRoutinePrompt()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1 transition">
                 <i data-lucide="Plus" class="w-3.5 h-3.5 text-orange-400"></i>
                 Nouvelle
+              </button>
+              <button onclick="renameCurrentRoutine()" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Renommer la routine">
+                <i data-lucide="Pencil" class="w-4 h-4"></i>
               </button>
               <button onclick="deleteCurrentRoutine()" class="p-1.5 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Supprimer la routine">
                 <i data-lucide="Trash2" class="w-4 h-4"></i>
@@ -184,11 +200,14 @@
           <div id="viewSessionLogging" class="p-5 space-y-5">
             <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/50 border border-borderDark rounded-xl p-3.5">
               <div>
-                <h2 class="text-sm font-bold text-white">Feuille de Séance : Objectif vs Répétitions Réussies</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Synchronisation automatique entre ton PC et ton téléphone.</p>
+                <h2 class="text-sm font-bold text-white">Feuille de Séance du Jour</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Saisis tes répétitions réussies, change un exo à la volée ou ajoute un exo bonus en bas.</p>
               </div>
               <div class="flex items-center gap-2">
                 <input type="date" id="sessionDateInput" class="bg-bgMain border border-borderDark rounded-xl px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:border-orange-500" />
+                <button onclick="resetDraftToRoutine()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition" title="Réinitialiser la feuille selon la routine de base">
+                  Réinitialiser
+                </button>
                 <button onclick="fillAllTargetReps()" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition flex items-center gap-1">
                   <i data-lucide="CheckCheck" class="w-3.5 h-3.5"></i>
                   Tout à 100%
@@ -210,9 +229,41 @@
             <!-- Exercises Cards -->
             <div id="sessionExercisesContainer" class="space-y-4"></div>
 
+            <!-- ADD BONUS / EXTRA EXERCISE FOR TODAY'S SESSION ONLY -->
+            <div class="bg-slate-900/80 border border-dashed border-sky-500/40 rounded-2xl p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                  <i data-lucide="PlusCircle" class="w-4 h-4"></i>
+                  <span>Ajouter un exercice en plus à la séance du jour</span>
+                </h3>
+                <span class="text-[11px] text-slate-400">N'écrase pas ta routine de base</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                <div class="sm:col-span-5">
+                  <select id="bonusExerciseSelect" onchange="toggleBonusCustomInput()" class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-sky-500">
+                  </select>
+                  <input type="text" id="bonusCustomExName" placeholder="Nom de l'exercice bonus..." class="hidden mt-2 w-full bg-bgMain border border-sky-500/50 rounded-xl px-3 py-2 text-xs text-white focus:outline-none" />
+                </div>
+                <div class="sm:col-span-2">
+                  <input type="number" id="bonusExSets" min="1" max="15" value="3" placeholder="Séries" title="Nombre de séries" class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono text-center" />
+                  <span class="block text-[10px] text-slate-500 text-center mt-0.5">Séries</span>
+                </div>
+                <div class="sm:col-span-2">
+                  <input type="number" id="bonusExReps" min="1" max="300" value="10" placeholder="Reps" title="Répétitions par série" class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono text-center" />
+                  <span class="block text-[10px] text-slate-500 text-center mt-0.5">Reps / Série</span>
+                </div>
+                <div class="sm:col-span-3 flex flex-col">
+                  <button onclick="addBonusExerciseToSession()" class="w-full py-2 px-3 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                    <i data-lucide="Plus" class="w-3.5 h-3.5"></i>
+                    Ajouter aujourd'hui
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <!-- Submit Session -->
             <div class="pt-2 border-t border-borderDark flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <input type="text" id="sessionNoteInput" placeholder="Note de séance (ex: Bonne congestion, RIR 1...)" class="flex-1 bg-bgMain border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500" />
+              <input type="text" id="sessionNoteInput" placeholder="Note de séance (ex: Ajouté un exo biceps/abdos à la fin, super séance...)" class="flex-1 bg-bgMain border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500" />
               <button onclick="saveCompletedSession()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-sm shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 transition">
                 <i data-lucide="Save" class="w-4 h-4"></i>
                 <span>Valider & Enregistrer la Séance</span>
@@ -223,7 +274,7 @@
           <!-- TAB 2: ROUTINE BUILDER -->
           <div id="viewRoutineBuilder" class="p-5 space-y-5 hidden">
             <div class="bg-bgMain border border-borderDark rounded-xl p-4 space-y-3">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-orange-400">Ajouter un exercice à la routine</h3>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-orange-400">Ajouter un exercice fixe à la routine</h3>
               <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
                 <div class="sm:col-span-5">
                   <label class="block text-[11px] text-slate-400 mb-1">Choisir dans la liste déroulante</label>
@@ -451,7 +502,7 @@
           </div>
           <div>
             <h3 class="text-base font-bold text-white">Base de Données Cloud Temps Réel</h3>
-            <p class="text-xs text-slate-400">Synchronisation automatique entre PC et Téléphone</p>
+            <p class="text-xs text-slate-400">Connecté à calisthenics-pro-623db</p>
           </div>
         </div>
         <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white p-1">
@@ -463,22 +514,24 @@
       <div class="bg-bgMain border border-sky-500/30 rounded-xl p-4 space-y-3">
         <div class="flex items-center justify-between">
           <h4 class="text-xs font-bold uppercase text-sky-400">URL Firebase Realtime Database</h4>
-          <span class="text-[10px] px-2 py-0.5 rounded bg-sky-500/15 text-sky-300">Auto-Sync</span>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300">Préconfiguré</span>
         </div>
-        <p class="text-xs text-slate-300 leading-relaxed">
-          Colle l'URL de ta base <a href="https://console.firebase.google.com/" target="_blank" class="text-sky-400 underline">Firebase Realtime Database</a> ci-dessous (ou inscris-la dans la constante <code class="text-orange-400">FIREBASE_DB_URL</code> du fichier <code class="text-orange-400">index.html</code> sur GitHub pour ne plus jamais avoir à la saisir) :
-        </p>
-        <input type="url" id="cloudEndpointInput" placeholder="https://calisthenics-pro-default-rtdb.europe-west1.firebasedatabase.app" class="w-full bg-bgCard border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500" />
+        <input type="url" id="cloudEndpointInput" value="https://calisthenics-pro-623db-default-rtdb.europe-west1.firebasedatabase.app" class="w-full bg-bgCard border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500" />
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <input type="text" id="cloudUserKeyInput" value="mathis_sw" placeholder="Identifiant (mathis_sw)" class="bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono" />
           <button onclick="connectAndPullCloud()" class="py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
             <i data-lucide="RefreshCw" class="w-3.5 h-3.5"></i>
-            Connecter & Charger
+            Charger du Cloud
           </button>
           <button onclick="pushToCloud(true)" class="py-2 px-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition">
             <i data-lucide="UploadCloud" class="w-3.5 h-3.5"></i>
             Forcer l'envoi Cloud
           </button>
+        </div>
+        <div class="bg-slate-900 border border-borderDark rounded-lg p-3 text-[11px] text-slate-300 space-y-1">
+          <p class="font-bold text-amber-400">Si tu vois "Erreur Cloud (401 Permission Denied)" :</p>
+          <p>Va sur Firebase &gt; <strong>Realtime Database</strong> &gt; onglet <strong>Règles (Rules)</strong> et publie :</p>
+          <pre class="bg-black/50 p-2 rounded text-emerald-400 mono text-[10px] overflow-x-auto">{ "rules": { ".read": true, ".write": true } }</pre>
         </div>
       </div>
 
@@ -510,10 +563,9 @@
 
   <script>
     // ============================================================================
-    // 👉 COLLE TON LIEN FIREBASE REALTIME DATABASE CI-DESSOUS ENTRE LES GUILLEMETS
-    // Exemple : const FIREBASE_DB_URL = "https://calisthenics-pro-default-rtdb.europe-west1.firebasedatabase.app";
+    // LIEN FIREBASE REALTIME DATABASE PRÉCONFIGURÉ POUR MATHIS
     // ============================================================================
-    const FIREBASE_DB_URL = "https://console.firebase.google.com/project/calisthenics-pro-623db/database/calisthenics-pro-623db-default-rtdb/data/~2F";
+    const FIREBASE_DB_URL = "https://calisthenics-pro-623db-default-rtdb.europe-west1.firebasedatabase.app";
     const DEFAULT_USER_KEY = "mathis_sw";
 
     const MASTER_STORAGE_KEY = 'calisthenics_pro_master_state';
@@ -634,20 +686,22 @@
     let timerInterval = null;
 
     function getActiveCloudUrl() {
-      const cleanHardcoded = (FIREBASE_DB_URL && FIREBASE_DB_URL !== "COLLE_TON_LIEN_FIREBASE_ICI")
-        ? FIREBASE_DB_URL.trim().replace(/\/+$/, '')
-        : '';
-      if (cleanHardcoded) {
-        return { endpoint: cleanHardcoded, userKey: DEFAULT_USER_KEY };
-      }
       try {
         const raw = localStorage.getItem(CLOUD_CONFIG_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (parsed && parsed.endpoint) return parsed;
+          if (parsed && parsed.endpoint && parsed.endpoint.startsWith('https://')) {
+            return {
+              endpoint: parsed.endpoint.trim().replace(/\/+$/, ''),
+              userKey: parsed.userKey || DEFAULT_USER_KEY
+            };
+          }
         }
       } catch (e) {}
-      return { endpoint: '', userKey: DEFAULT_USER_KEY };
+      return {
+        endpoint: FIREBASE_DB_URL.trim().replace(/\/+$/, ''),
+        userKey: DEFAULT_USER_KEY
+      };
     }
 
     function buildFirebaseRestEndpoint(cfg) {
@@ -671,10 +725,10 @@
         badge.textContent = text || '↻ Synchronisation...';
         dot.className = 'w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse';
       } else {
-        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30';
-        badge.textContent = text || 'Sauvegarde Locale (Clique sur Base Cloud)';
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
-        btnLabel.textContent = 'Configurer Cloud';
+        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30';
+        badge.textContent = text || '⚠️ Erreur Cloud';
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+        btnLabel.textContent = 'Vérifier Règles Cloud';
       }
     }
 
@@ -696,7 +750,6 @@
       return st;
     }
 
-    // Save locally AND push to Firebase Realtime DB automatically
     function saveStateImmediate() {
       try {
         appState.updatedAt = Date.now();
@@ -710,28 +763,29 @@
           pushDebounceTimer = setTimeout(() => {
             pushToCloud(false);
           }, 250);
-        } else {
-          const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          updateStatusIndicator('local', `✓ Local (${now}) • Clique sur Configurer Cloud`);
         }
       } catch (e) {
         console.error('Erreur sauvegarde:', e);
       }
     }
 
-    // Automatic Cloud Pull on startup & tab focus
     async function autoSyncFromCloudOnStartup() {
       const cfg = getActiveCloudUrl();
-      if (!cfg.endpoint) {
-        updateStatusIndicator('local', 'Mode Local • Clique sur "Configurer Cloud"');
-        return;
-      }
-      updateStatusIndicator('syncing', '↻ Récupération Cloud...');
+      const rulesAlert = document.getElementById('firebaseRulesAlert');
+      if (!cfg.endpoint) return;
+
+      updateStatusIndicator('syncing', '↻ Synchronisation Cloud...');
       try {
         const res = await fetch(buildFirebaseRestEndpoint(cfg), { cache: 'no-store' });
+        if (res.status === 401 || res.status === 403) {
+          rulesAlert.classList.remove('hidden');
+          updateStatusIndicator('error', '⚠️ Règles Firebase verrouillées (401)');
+          return;
+        }
         if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
+        rulesAlert.classList.add('hidden');
 
+        const data = await res.json();
         if (data && data.state && Array.isArray(data.state.routines)) {
           appState = normalizeState(data.state);
           localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(appState));
@@ -740,18 +794,20 @@
           const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
           updateStatusIndicator('cloud_ok', `☁️ Synchronisé Cloud • ${now}`);
         } else {
-          // La base Firebase est vide pour l'instant : on y pousse les données actuelles
+          // Base vide au premier lancement : on envoie l'état initial
           await pushToCloud(false);
         }
       } catch (e) {
-        updateStatusIndicator('local', '⚠️ Erreur Cloud (Vérifie le lien Firebase)');
+        updateStatusIndicator('error', '⚠️ Erreur Cloud (Vérifie Règles Firebase)');
       }
     }
 
     async function pushToCloud(verbose = true) {
       const cfg = getActiveCloudUrl();
       const msg = document.getElementById('cloudFeedbackMsg');
+      const rulesAlert = document.getElementById('firebaseRulesAlert');
       if (!cfg.endpoint) return;
+
       try {
         const res = await fetch(buildFirebaseRestEndpoint(cfg), {
           method: 'PUT',
@@ -761,7 +817,15 @@
             state: appState
           })
         });
+        if (res.status === 401 || res.status === 403) {
+          rulesAlert.classList.remove('hidden');
+          updateStatusIndicator('error', '⚠️ Règles Firebase verrouillées (401)');
+          if (verbose && msg) msg.textContent = 'Accès refusé (401) : publie { "rules": { ".read": true, ".write": true } } dans l’onglet Règles de Firebase.';
+          return;
+        }
         if (!res.ok) throw new Error('HTTP ' + res.status);
+        rulesAlert.classList.add('hidden');
+
         const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         updateStatusIndicator('cloud_ok', `☁️ Synchronisé Cloud • ${now}`);
         if (verbose && msg) {
@@ -769,8 +833,8 @@
           showToast('Synchronisé dans le Cloud !');
         }
       } catch (e) {
-        updateStatusIndicator('local', '⚠️ Erreur écriture Cloud');
-        if (verbose && msg) msg.textContent = 'Erreur : Vérifie ton URL Firebase et que les Rules sont en ".read": true, ".write": true.';
+        updateStatusIndicator('error', '⚠️ Erreur écriture Cloud');
+        if (verbose && msg) msg.textContent = 'Erreur : Vérifie que les Règles (Rules) sur Firebase sont sur true.';
       }
     }
 
@@ -778,21 +842,17 @@
       const endpoint = document.getElementById('cloudEndpointInput').value.trim().replace(/\/+$/, '');
       const userKey = (document.getElementById('cloudUserKeyInput').value.trim() || DEFAULT_USER_KEY).replace(/[^a-zA-Z0-9_-]/g, '');
       const msg = document.getElementById('cloudFeedbackMsg');
-      if (!endpoint) {
-        msg.textContent = 'Colle ton lien Firebase Realtime Database ci-dessus.';
-        return;
-      }
       localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ endpoint, userKey }));
       msg.textContent = 'Connexion à Firebase en cours...';
       await autoSyncFromCloudOnStartup();
-      msg.textContent = '✓ Connecté et synchronisé !';
-      showToast('Base de données Cloud connectée !');
+      msg.textContent = '✓ Synchronisation terminée !';
     }
 
     function populateExerciseSelects() {
       const selects = [
         document.getElementById('builderExerciseSelect'),
-        document.getElementById('maxExerciseSelect')
+        document.getElementById('maxExerciseSelect'),
+        document.getElementById('bonusExerciseSelect')
       ];
       selects.forEach(sel => {
         if (!sel) return;
@@ -815,9 +875,9 @@
       });
     }
 
-    function buildExerciseSelectHtml(selectedName, exIdx) {
+    function buildExerciseSelectHtml(selectedName, exIdx, handlerName = 'handleBuilderRowExerciseChange') {
       let foundInCatalog = false;
-      let html = `<select onchange="handleBuilderRowExerciseChange(${exIdx}, this.value)" class="bg-bgMain border border-borderDark rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-orange-500">`;
+      let html = `<select onchange="${handlerName}(${exIdx}, this.value)" class="bg-bgMain border border-borderDark rounded-lg px-2.5 py-1 text-xs font-bold text-white focus:outline-none focus:border-orange-500 max-w-[230px] truncate">`;
       EXERCISE_CATALOG.forEach(group => {
         html += `<optgroup label="${group.category}">`;
         group.items.forEach(item => {
@@ -830,7 +890,7 @@
       if (!foundInCatalog) {
         html += `<option value="${selectedName}" selected>${selectedName}</option>`;
       }
-      html += `<option value="__CUSTOM__">+ Personnalisé...</option></select>`;
+      html += `<option value="__CUSTOM__">+ Autre exercice...</option></select>`;
       return html;
     }
 
@@ -844,6 +904,13 @@
     function toggleMaxCustomInput() {
       const sel = document.getElementById('maxExerciseSelect');
       const inp = document.getElementById('maxCustomExName');
+      inp.classList.toggle('hidden', sel.value !== '__CUSTOM__');
+      if (sel.value === '__CUSTOM__') inp.focus();
+    }
+
+    function toggleBonusCustomInput() {
+      const sel = document.getElementById('bonusExerciseSelect');
+      const inp = document.getElementById('bonusCustomExName');
       inp.classList.toggle('hidden', sel.value !== '__CUSTOM__');
       if (sel.value === '__CUSTOM__') inp.focus();
     }
@@ -863,19 +930,27 @@
         currentSessionDraft = [];
         return;
       }
-      if (!forceReset && Array.isArray(appState.draft) && appState.draft.length === routine.exercises.length) {
+      if (!forceReset && Array.isArray(appState.draft) && appState.draft.length > 0) {
         currentSessionDraft = appState.draft;
         return;
       }
       currentSessionDraft = routine.exercises.map(ex => ({
         id: ex.id,
         name: ex.name,
+        isBonus: false,
         targetSets: Number(ex.targetSets) || 4,
         targetReps: Number(ex.targetReps) || 10,
         targetWeight: Number(ex.targetWeight) || 0,
         actualWeight: Number(ex.targetWeight) || 0,
         achievedSets: Array.from({ length: Number(ex.targetSets) || 4 }, () => Number(ex.targetReps) || 10)
       }));
+    }
+
+    function resetDraftToRoutine() {
+      initSessionDraftFromRoutine(true);
+      saveStateImmediate();
+      renderSessionLoggingView();
+      showToast('Feuille de séance réinitialisée selon la routine.');
     }
 
     function renderRoutineSelect() {
@@ -903,6 +978,45 @@
       saveStateImmediate();
       renderSessionLoggingView();
       renderRoutineBuilderView();
+    }
+
+    function duplicateCurrentRoutine() {
+      const source = getActiveRoutine();
+      if (!source) return;
+      const newName = prompt('Nom de la routine dupliquée :', `${source.name} (Variante)`);
+      if (!newName || !newName.trim()) return;
+
+      const duplicated = {
+        id: 'routine_' + Date.now(),
+        name: newName.trim(),
+        exercises: source.exercises.map((ex, i) => ({
+          id: 'ex_' + Date.now() + '_' + i,
+          name: ex.name,
+          targetSets: ex.targetSets,
+          targetReps: ex.targetReps,
+          targetWeight: ex.targetWeight || 0
+        }))
+      };
+
+      appState.routines.push(duplicated);
+      appState.activeRoutineId = duplicated.id;
+      initSessionDraftFromRoutine(true);
+      saveStateImmediate();
+      renderRoutineSelect();
+      renderSessionLoggingView();
+      renderRoutineBuilderView();
+      showToast(`Routine "${duplicated.name}" dupliquée !`);
+    }
+
+    function renameCurrentRoutine() {
+      const r = getActiveRoutine();
+      if (!r) return;
+      const newName = prompt('Nouveau nom de la routine :', r.name);
+      if (!newName || !newName.trim()) return;
+      r.name = newName.trim();
+      saveStateImmediate();
+      renderRoutineSelect();
+      showToast('Routine renommée !');
     }
 
     function switchMainTab(tab) {
@@ -944,12 +1058,13 @@
       lucide.createIcons();
     }
 
+    // TAB 1: SESSION LOGGING (WITH ON-THE-FLY SWAP & BONUS EXERCISES)
     function renderSessionLoggingView() {
       const container = document.getElementById('sessionExercisesContainer');
       container.innerHTML = '';
 
       if (currentSessionDraft.length === 0) {
-        container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">Aucun exercice dans cette routine. Va dans <strong>2. Éditer Routine</strong>.</div>`;
+        container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">Aucun exercice dans cette séance. Ajoute un exercice ci-dessous ou dans <strong>2. Éditer Routine</strong>.</div>`;
         updateLiveSessionSummary();
         return;
       }
@@ -979,20 +1094,24 @@
         }).join('');
 
         const card = document.createElement('div');
-        card.className = 'bg-slate-900/60 border border-borderDark rounded-2xl p-4 space-y-3';
+        card.className = `bg-slate-900/60 border ${ex.isBonus ? 'border-sky-500/40' : 'border-borderDark'} rounded-2xl p-4 space-y-3`;
         card.innerHTML = `
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="w-6 h-6 rounded-lg bg-orange-500/15 text-orange-400 font-bold text-xs flex items-center justify-center mono">${exIdx + 1}</span>
-              <h3 class="text-sm font-bold text-white">${ex.name}</h3>
+              <span class="w-6 h-6 rounded-lg ${ex.isBonus ? 'bg-sky-500/20 text-sky-400' : 'bg-orange-500/15 text-orange-400'} font-bold text-xs flex items-center justify-center mono">${exIdx + 1}</span>
+              ${buildExerciseSelectHtml(ex.name, exIdx, 'handleDraftExerciseSwap')}
               <span class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 mono">
                 Obj : ${ex.targetSets} × ${ex.targetReps} ${ex.targetWeight > 0 ? '(+' + ex.targetWeight + 'kg)' : ''}
               </span>
-              ${allSetsValidated && appState.autoLevelUp ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">🔥 Level-Up prêt</span>` : ''}
+              ${ex.isBonus ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30">+ Bonus du jour</span>` : ''}
+              ${!ex.isBonus && allSetsValidated && appState.autoLevelUp ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">🔥 Level-Up prêt</span>` : ''}
             </div>
             <div class="flex items-center gap-2">
               <span id="exSummary_${exIdx}" class="mono text-xs font-bold text-white">${achievedTotal}/${targetTotal} (${pct}%)</span>
-              <button onclick="setExerciseFullTarget(${exIdx})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-500/20 text-[11px] font-semibold text-slate-300 hover:text-emerald-300 transition">100%</button>
+              <button onclick="setExerciseFullTarget(${exIdx})" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-emerald-500/20 text-[11px] font-semibold text-slate-300 hover:text-emerald-300 transition">100%</button>
+              <button onclick="removeExerciseFromTodayDraft(${exIdx})" class="p-1 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Retirer cet exercice de la séance d'aujourd'hui">
+                <i data-lucide="X" class="w-3.5 h-3.5"></i>
+              </button>
             </div>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
@@ -1014,6 +1133,57 @@
 
       updateLiveSessionSummary();
       lucide.createIcons();
+    }
+
+    function handleDraftExerciseSwap(exIdx, newVal) {
+      if (!currentSessionDraft[exIdx]) return;
+      if (newVal === '__CUSTOM__') {
+        const custom = prompt("Nom de l'exercice pour aujourd'hui :");
+        if (custom && custom.trim()) {
+          currentSessionDraft[exIdx].name = custom.trim();
+        }
+      } else {
+        currentSessionDraft[exIdx].name = newVal;
+      }
+      saveStateImmediate();
+      renderSessionLoggingView();
+      showToast('Exercice modifié pour la séance du jour !');
+    }
+
+    function removeExerciseFromTodayDraft(exIdx) {
+      currentSessionDraft.splice(exIdx, 1);
+      saveStateImmediate();
+      renderSessionLoggingView();
+      showToast('Exercice retiré de la séance du jour.');
+    }
+
+    function addBonusExerciseToSession() {
+      const sel = document.getElementById('bonusExerciseSelect');
+      const customInp = document.getElementById('bonusCustomExName');
+      const name = sel.value === '__CUSTOM__' ? customInp.value.trim() : sel.value;
+      if (!name) {
+        showToast("Choisis ou écris le nom de l'exercice bonus.");
+        return;
+      }
+      const sets = Math.max(1, parseInt(document.getElementById('bonusExSets').value, 10) || 3);
+      const reps = Math.max(1, parseInt(document.getElementById('bonusExReps').value, 10) || 10);
+
+      currentSessionDraft.push({
+        id: 'bonus_' + Date.now(),
+        name,
+        isBonus: true,
+        targetSets: sets,
+        targetReps: reps,
+        targetWeight: 0,
+        actualWeight: 0,
+        achievedSets: Array.from({ length: sets }, () => reps)
+      });
+
+      customInp.value = '';
+      saveStateImmediate();
+      renderSessionLoggingView();
+      populateChartExerciseDropdown();
+      showToast(`"${name}" ajouté en bonus à la séance d'aujourd'hui !`);
     }
 
     function updateDraftSetRep(exIdx, setIdx, val) {
@@ -1089,6 +1259,7 @@
         note: noteVal,
         exercises: currentSessionDraft.map(ex => ({
           name: ex.name,
+          isBonus: !!ex.isBonus,
           targetSets: ex.targetSets,
           targetReps: ex.targetReps,
           targetWeight: ex.targetWeight,
@@ -1099,10 +1270,12 @@
 
       let leveledUpCount = 0;
       if (appState.autoLevelUp && routine) {
-        currentSessionDraft.forEach((draftEx, idx) => {
+        currentSessionDraft.forEach(draftEx => {
+          if (draftEx.isBonus) return;
+          const routineEx = routine.exercises.find(re => re.id === draftEx.id || re.name === draftEx.name);
           const allPassed = draftEx.achievedSets.every(r => Number(r) >= draftEx.targetReps);
-          if (allPassed && routine.exercises[idx]) {
-            routine.exercises[idx].targetReps += 1;
+          if (allPassed && routineEx) {
+            routineEx.targetReps += 1;
             leveledUpCount++;
           }
         });
@@ -1140,7 +1313,7 @@
         row.innerHTML = `
           <div class="flex items-center gap-2 flex-1 min-w-[210px]">
             <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center mono">${idx + 1}</span>
-            ${buildExerciseSelectHtml(ex.name, idx)}
+            ${buildExerciseSelectHtml(ex.name, idx, 'handleBuilderRowExerciseChange')}
           </div>
           <div class="flex flex-wrap items-center gap-3">
             <div class="flex items-center gap-1.5">
@@ -1208,7 +1381,7 @@
       renderRoutineSelect();
       renderRoutineBuilderView();
       populateChartExerciseDropdown();
-      showToast(`"${name}" ajouté et synchronisé !`);
+      showToast(`"${name}" ajouté à la routine !`);
     }
 
     function updateRoutineExerciseField(exIdx, field, value) {
@@ -1498,7 +1671,11 @@
           const exD = ex.achievedSets.reduce((a, b) => a + (Number(b) || 0), 0);
           return `
             <div class="flex items-center justify-between text-[11px] py-1 border-b border-slate-800/60 last:border-none">
-              <span class="text-slate-300">${ex.name} ${ex.actualWeight > 0 ? `<strong class="text-sky-400">(+${ex.actualWeight}kg)</strong>` : ''}</span>
+              <span class="text-slate-300">
+                ${ex.name}
+                ${ex.isBonus ? `<span class="text-[10px] text-sky-400 font-semibold">(+Bonus)</span>` : ''}
+                ${ex.actualWeight > 0 ? `<strong class="text-sky-400">(+${ex.actualWeight}kg)</strong>` : ''}
+              </span>
               <span class="mono font-semibold text-white">
                 ${isMax ? `<strong class="text-purple-400">MAX : ${exD}${ex.unit || 'reps'}</strong>` : `[${ex.achievedSets.join('-')}] = <strong class="${exD >= exT ? 'text-emerald-400' : 'text-orange-400'}">${exD}/${exT}</strong>`}
               </span>
@@ -1545,6 +1722,7 @@
       const names = new Set();
       appState.routines.forEach(r => r.exercises.forEach(e => names.add(e.name)));
       appState.sessions.forEach(s => s.exercises.forEach(e => names.add(e.name)));
+      currentSessionDraft.forEach(e => names.add(e.name));
 
       sel.innerHTML = `<option value="__ALL__">Toute la séance (Total Reps)</option>`;
       Array.from(names).forEach(n => {
@@ -1718,7 +1896,7 @@
     // MODAL & JSON BACKUP
     function openSyncModal() {
       const cfg = getActiveCloudUrl();
-      document.getElementById('cloudEndpointInput').value = cfg.endpoint || '';
+      document.getElementById('cloudEndpointInput').value = cfg.endpoint || FIREBASE_DB_URL;
       document.getElementById('cloudUserKeyInput').value = cfg.userKey || DEFAULT_USER_KEY;
       document.getElementById('syncModal').classList.remove('hidden');
       document.getElementById('syncModal').classList.add('flex');
@@ -1780,8 +1958,13 @@
       lucide.createIcons();
     }
 
-    // INITIALISATION + AUTO-PULL AU DÉMARRAGE ET AU RETOUR SUR L'ONGLET
     window.addEventListener('DOMContentLoaded', async () => {
+      // Force la mise à jour vers ton URL Firebase officielle
+      localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({
+        endpoint: FIREBASE_DB_URL,
+        userKey: DEFAULT_USER_KEY
+      }));
+
       const today = new Date().toISOString().slice(0, 10);
       document.getElementById('sessionDateInput').value = today;
       document.getElementById('maxDateInput').value = today;
@@ -1791,7 +1974,6 @@
       await autoSyncFromCloudOnStartup();
     });
 
-    // Quand tu déverrouilles ton téléphone ou reviens sur la page, récupère automatiquement les nouveautés
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         autoSyncFromCloudOnStartup();
