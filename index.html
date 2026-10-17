@@ -4,593 +4,438 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CALISTHENICS PRO — Street Workout & Skills Tracker</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            bgMain: '#07090e',
-            bgCard: '#111520',
-            bgCardHover: '#171d2c',
-            accent: '#f97316',
-            accentHover: '#ea580c',
-            neonGreen: '#10b981',
-            neonPurple: '#a855f7',
-            borderDark: '#1e2638'
+            bgMain: '#090b10',
+            bgCard: '#121620',
+            bgCardHover: '#181e2c',
+            borderDark: '#1f2737'
           }
         }
       }
     }
   </script>
-
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@700;800&display=swap');
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #07090e;
-      background-image:
-        radial-gradient(at 0% 0%, rgba(249, 115, 22, 0.08) 0px, transparent 45%),
-        radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.07) 0px, transparent 45%),
-        radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
-      color: #f3f4f6;
-      overflow-x: hidden;
-    }
-
-    .font-display {
-      font-family: 'Outfit', sans-serif;
-    }
-
-    .mono {
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #07090e;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #232c40;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #f97316;
-    }
-
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      opacity: 1;
-    }
-
-    @keyframes pulseSave {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.04); }
-      100% { transform: scale(1); }
-    }
-    .save-flash {
-      animation: pulseSave 0.25s ease-in-out;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #090b10; color: #f3f4f6; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090b10; }
+    ::-webkit-scrollbar-thumb { background: #263044; border-radius: 3px; }
   </style>
 </head>
-
 <body class="min-h-screen flex flex-col selection:bg-orange-500 selection:text-white">
 
-  <!-- 1. BARRE SUPÉRIEURE (NAVBAR) -->
+  <!-- TOP NAVBAR -->
   <header class="sticky top-0 z-30 bg-bgMain/95 backdrop-blur-md border-b border-borderDark px-4 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <!-- Logo & Identité -->
       <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
           <i data-lucide="Flame" class="w-6 h-6 text-white"></i>
         </div>
         <div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <h1 class="font-display text-lg sm:text-xl font-extrabold tracking-tight text-white">
-              CALISTHENICS <span class="text-orange-500">PRO</span>
-            </h1>
-            <span class="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-              GitHub Pages Ready
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-extrabold tracking-tight text-white">CALISTHENICS <span class="text-orange-500">PRO</span></h1>
+            <span id="saveIndicatorBadge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              ✓ Sauvegarde Auto Active
             </span>
           </div>
-          <p class="text-xs text-slate-400">Routine • Objectifs de Figures • Max Hors Routine</p>
+          <p class="text-xs text-slate-400">Routine, Surcharge Progressive, Figures & Max Hors Routine</p>
         </div>
       </div>
 
-      <!-- Indicateur de Sauvegarde Instantanée + Chronomètre Double Mode + Cloud/Backup -->
+      <!-- Dual Timer + Sync Button -->
       <div class="flex items-center gap-2.5 flex-wrap">
-
-        <!-- Badge de Sauvegarde Automatique + Bouton Manuel -->
-        <div id="saveBadgeContainer" class="flex items-center gap-2 bg-emerald-950/40 border border-emerald-500/30 rounded-xl px-3 py-1.5 transition-all">
-          <span id="saveStatusDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span id="saveStatusText" class="text-[11px] font-semibold text-emerald-300">✓ Sauvegardé sur l'appareil</span>
-          <button onclick="manualSaveTrigger()" class="ml-1 px-2 py-0.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 hover:text-white text-[10px] font-bold text-emerald-200 transition" title="Forcer la sauvegarde immédiate">
-            Sauvegarder
+        <!-- Timer -->
+        <div class="flex items-center gap-1.5 bg-bgCard border border-borderDark rounded-xl px-3 py-1.5">
+          <button onclick="switchTimerMode()" id="timerModeBtn" class="text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 transition" title="Basculer Repos / Maintien">
+            Repos
           </button>
-        </div>
-
-        <!-- Chronomètre Double Fonction : Repos (Décompte) / Maintien (Chrono montant) -->
-        <div class="flex items-center gap-1.5 bg-bgCard border border-borderDark rounded-xl px-2.5 py-1.5">
-          <div class="flex bg-slate-900 rounded-lg p-0.5 border border-borderDark">
-            <button id="modeRestBtn" onclick="setTimerMode('rest')" class="px-2 py-1 rounded-md text-[10px] font-bold bg-orange-500 text-white transition" title="Minuteur de repos (Décompte)">
-              Repos
-            </button>
-            <button id="modeHoldBtn" onclick="setTimerMode('hold')" class="px-2 py-1 rounded-md text-[10px] font-bold text-slate-400 hover:text-white transition" title="Chronomètre montant pour maintien statique (Front Lever, Planche, L-Sit)">
-              Maintien
-            </button>
-          </div>
-
-          <span id="timerDisplay" class="mono text-sm font-extrabold text-white w-14 text-center">01:30</span>
-
-          <button onclick="toggleTimer()" id="timerStartBtn" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500 hover:text-white transition">
+          <span id="timerDisplay" class="mono text-sm font-bold text-white w-14 text-center">01:30</span>
+          <button onclick="toggleTimer()" id="timerStartBtn" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition">
             Go
           </button>
-
-          <div id="restPresetsBox" class="flex items-center gap-1">
-            <button onclick="setPresetTimer(90)" class="text-[11px] font-mono text-slate-400 hover:text-white px-1.5 py-0.5 rounded bg-slate-800/70">1m30</button>
-            <button onclick="setPresetTimer(120)" class="text-[11px] font-mono text-slate-400 hover:text-white px-1.5 py-0.5 rounded bg-slate-800/70">2m00</button>
+          <button onclick="resetTimer()" class="p-1 text-slate-400 hover:text-white" title="Réinitialiser">
+            <i data-lucide="RotateCcw" class="w-3.5 h-3.5"></i>
+          </button>
+          <div id="restPresets" class="flex items-center gap-1 border-l border-borderDark pl-1.5">
+            <button onclick="setPresetTimer(90)" class="text-[11px] text-slate-400 hover:text-white px-1">1m30</button>
+            <button onclick="setPresetTimer(120)" class="text-[11px] text-slate-400 hover:text-white px-1">2m</button>
           </div>
-          <div id="holdActionsBox" class="hidden items-center gap-1">
-            <button onclick="resetStopwatch()" class="text-[11px] font-mono text-slate-400 hover:text-white px-1.5 py-0.5 rounded bg-slate-800/70" title="Remettre à zéro">00:00</button>
-            <button onclick="useStopwatchInMax()" class="text-[10px] font-bold text-purple-300 hover:text-white px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/30" title="Envoyer ce temps dans l'onglet 3. Entrer un Max">
-              → Max
-            </button>
-          </div>
+          <button id="sendHoldToMaxBtn" onclick="sendStopwatchToMax()" class="hidden text-[11px] font-bold text-purple-400 hover:text-purple-300 border-l border-borderDark pl-2">
+            → Max
+          </button>
         </div>
 
-        <!-- Bouton Cloud Sync & JSON Backup -->
-        <button onclick="openCloudModal()" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-bgCard hover:bg-bgCardHover border border-borderDark transition text-xs font-semibold">
-          <span id="cloudStatusDot" class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
-          <i data-lucide="Cloud" class="w-4 h-4 text-sky-400"></i>
-          <span id="cloudStatusText" class="text-slate-200 hidden sm:inline">Cloud & Backup</span>
+        <!-- Sync PC / Phone Modal Button -->
+        <button onclick="openSyncModal()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-bgCard hover:bg-bgCardHover border border-borderDark transition text-xs font-bold text-white">
+          <span id="cloudStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+          <i data-lucide="Smartphone" class="w-4 h-4 text-sky-400"></i>
+          <span>Sync PC ↔ Tel</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- CONTENEUR PRINCIPAL -->
+  <!-- MAIN CONTENT -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
 
-    <!-- BANNIÈRE LEVEL-UP SURCHARGE PROGRESSIVE -->
-    <div id="levelUpBanner" class="hidden bg-gradient-to-r from-emerald-950/90 via-slate-900 to-orange-950/80 border border-emerald-500/40 rounded-2xl p-4 shadow-xl">
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex items-start gap-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
-            <i data-lucide="Zap" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-              <span>SURCHARGE PROGRESSIVE ACTIVÉE — NIVEAU SUPÉRIERIEUR !</span>
-              <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Objectifs Augmentés</span>
-            </h3>
-            <p class="text-xs text-slate-300 mt-1">
-              Vous avez validé 100 % de vos séries sur ces exercices. Vos objectifs de routine ont été automatiquement augmentés et sauvegardés pour la prochaine séance :
-            </p>
-            <div id="levelUpList" class="flex flex-wrap gap-2 mt-2.5"></div>
-          </div>
-        </div>
-        <button onclick="document.getElementById('levelUpBanner').classList.add('hidden')" class="text-slate-400 hover:text-white p-1">
-          <i data-lucide="X" class="w-4 h-4"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- 2. BARRE DE KPI (4 CARTES) -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- KPI SUMMARY BAR -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-bgCard border border-borderDark rounded-2xl p-4 flex items-center justify-between">
         <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Séances Validées</p>
+          <p class="text-xs text-slate-400 uppercase font-semibold">Séances & Tests</p>
           <p id="kpiTotalSessions" class="text-2xl font-extrabold text-white mt-1 mono">0</p>
-          <p id="kpiLastSessionDate" class="text-[11px] text-slate-400 mt-1">Aucune entrée</p>
+          <p id="kpiLastSessionDate" class="text-[11px] text-slate-400 mt-1">Aucune séance</p>
         </div>
-        <div class="w-11 h-11 rounded-xl bg-orange-500/10 border border-orange-500/25 flex items-center justify-center text-orange-400">
+        <div class="w-11 h-11 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
           <i data-lucide="CalendarCheck" class="w-5 h-5"></i>
         </div>
       </div>
 
       <div class="bg-bgCard border border-borderDark rounded-2xl p-4 flex items-center justify-between">
         <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Taux Objectif Moyen</p>
+          <p class="text-xs text-slate-400 uppercase font-semibold">Taux Objectif Moyen</p>
           <p id="kpiAvgCompletion" class="text-2xl font-extrabold text-emerald-400 mt-1 mono">0%</p>
           <p class="text-[11px] text-slate-400 mt-1">Reps réussies / Objectif</p>
         </div>
-        <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
+        <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
           <i data-lucide="Target" class="w-5 h-5"></i>
         </div>
       </div>
 
       <div class="bg-bgCard border border-borderDark rounded-2xl p-4 flex items-center justify-between">
         <div>
-          <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Volume Total Réalisé</p>
-          <p id="kpiTotalReps" class="text-2xl font-extrabold text-sky-400 mt-1 mono">0</p>
-          <p id="kpiTargetRepsTotal" class="text-[11px] text-slate-400 mt-1">Cumul séances & max</p>
+          <p class="text-xs text-slate-400 uppercase font-semibold">Figures Validées</p>
+          <p id="kpiSkillsValidated" class="text-2xl font-extrabold text-purple-400 mt-1 mono">0 / 0</p>
+          <p class="text-[11px] text-slate-400 mt-1">Objectifs de skills atteints</p>
         </div>
-        <div class="w-11 h-11 rounded-xl bg-sky-500/10 border border-sky-500/25 flex items-center justify-center text-sky-400">
-          <i data-lucide="Activity" class="w-5 h-5"></i>
+        <div class="w-11 h-11 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+          <i data-lucide="Sparkles" class="w-5 h-5"></i>
         </div>
       </div>
 
       <div class="bg-bgCard border border-borderDark rounded-2xl p-4 flex items-center justify-between">
-        <div class="min-w-0 pr-2">
-          <p class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Meilleur Record (PR)</p>
-          <p id="kpiBestPR" class="text-base font-extrabold text-amber-400 mt-1 truncate">—</p>
-          <p id="kpiBestPRSub" class="text-[11px] text-slate-400 mt-1 truncate">Record absolu</p>
+        <div>
+          <p class="text-xs text-slate-400 uppercase font-semibold">Meilleur Record (PR)</p>
+          <p id="kpiBestPR" class="text-base font-extrabold text-amber-400 mt-1 truncate max-w-[150px]">—</p>
+          <p id="kpiBestPRSub" class="text-[11px] text-slate-400 mt-1">Max sur 1 série</p>
         </div>
-        <div class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 shrink-0">
+        <div class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
           <i data-lucide="Trophy" class="w-5 h-5"></i>
         </div>
       </div>
     </section>
 
-    <!-- GRILLE PRINCIPALE : COLONNE GAUCHE (7 COLS) & COLONNE DROITE (5 COLS) -->
+    <!-- MAIN GRID -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      <!-- 3. COLONNE GAUCHE : 3 ONGLETS INTERACTIFS + OBJECTIFS DE FIGURES -->
+      <!-- LEFT COLUMN (7 COLS): WORKOUT TABS + SKILLS TRACKER -->
       <div class="lg:col-span-7 space-y-6">
 
-        <!-- CARTE PRINCIPALE À 3 ONGLETS -->
+        <!-- CARD 1: ROUTINE, SESSION & MAX LOGGING -->
         <div class="bg-bgCard border border-borderDark rounded-2xl overflow-hidden shadow-xl">
-
-          <!-- Barre d'onglets -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 border-b border-borderDark bg-slate-900/70">
-            <button id="tabBtnSession" onclick="switchMainTab('session')" class="py-3.5 px-3 text-xs font-bold flex items-center justify-center gap-1.5 border-b-2 border-orange-500 text-orange-400 bg-orange-500/5 transition">
+          <!-- 3 Navigation Tabs -->
+          <div class="grid grid-cols-3 border-b border-borderDark bg-slate-900/60">
+            <button id="tabBtnSession" onclick="switchMainTab('session')" class="py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-orange-500 text-orange-400 bg-orange-500/5 transition">
               <i data-lucide="CheckCircle2" class="w-4 h-4 shrink-0"></i>
-              <span>1. Bilan de Séance (Reps Réussies)</span>
+              <span>1. Fin de Séance</span>
             </button>
-            <button id="tabBtnBuilder" onclick="switchMainTab('builder')" class="py-3.5 px-3 text-xs font-bold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition">
+            <button id="tabBtnBuilder" onclick="switchMainTab('builder')" class="py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition">
               <i data-lucide="Sliders" class="w-4 h-4 shrink-0"></i>
-              <span>2. Éditer Ma Routine (Objectifs)</span>
+              <span>2. Éditer Routine</span>
             </button>
-            <button id="tabBtnMax" onclick="switchMainTab('max')" class="py-3.5 px-3 text-xs font-bold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition">
-              <i data-lucide="Flame" class="w-4 h-4 shrink-0 text-purple-400"></i>
-              <span>3. Entrer un Max / Hors Routine</span>
+            <button id="tabBtnMax" onclick="switchMainTab('max')" class="py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition">
+              <i data-lucide="Zap" class="w-4 h-4 shrink-0 text-purple-400"></i>
+              <span>3. Max Hors Routine</span>
             </button>
           </div>
 
-          <!-- Barre de sélection de Routine + Surcharge Progressive (Visible sur Onglets 1 et 2) -->
-          <div id="routineSelectorBar" class="p-4 bg-slate-900/40 border-b border-borderDark space-y-3">
-            <div class="flex flex-wrap items-center justify-between gap-2.5">
-              <div class="flex items-center gap-2 flex-1 min-w-[210px]">
-                <label for="activeRoutineSelect" class="text-xs font-semibold text-slate-400 uppercase whitespace-nowrap">Routine :</label>
-                <select id="activeRoutineSelect" onchange="handleRoutineChange()" class="flex-1 bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-orange-500">
-                </select>
-              </div>
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <button onclick="openRenameRoutineModal()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1 transition" title="Renommer la routine">
-                  <i data-lucide="Pencil" class="w-3.5 h-3.5 text-sky-400"></i>
-                  <span>Renommer</span>
-                </button>
-                <button onclick="openNewRoutineModal()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1 transition">
-                  <i data-lucide="FolderPlus" class="w-3.5 h-3.5 text-orange-400"></i>
-                  <span>+ Nouvelle routine</span>
-                </button>
-                <button onclick="openDeleteRoutineModal()" class="p-1.5 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Supprimer cette routine">
-                  <i data-lucide="Trash2" class="w-4 h-4"></i>
-                </button>
-              </div>
-            </div>
-
-            <!-- Réglage Surcharge Progressive Automatique (Persisté dans localStorage) -->
-            <div class="bg-bgMain/80 border border-emerald-500/20 rounded-xl px-3 py-2 flex flex-wrap items-center justify-between gap-2">
-              <label class="flex items-center gap-2 cursor-pointer select-none">
-                <input type="checkbox" id="autoOverloadToggle" onchange="handleOverloadSettingChange()" class="w-4 h-4 rounded accent-emerald-500" />
-                <span class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                  <i data-lucide="TrendingUp" class="w-3.5 h-3.5 text-emerald-400"></i>
-                  Auto Level-Up (Surcharge Progressive si 100% validé)
-                </span>
-              </label>
-              <select id="overloadModeSelect" onchange="handleOverloadSettingChange()" class="bg-bgCard border border-emerald-500/30 rounded-lg px-2.5 py-1 text-[11px] font-bold text-emerald-300 focus:outline-none">
-                <option value="reps">+1 rep / série au prochain entraînement</option>
-                <option value="weight">+2.5 kg de lest au prochain entraînement</option>
+          <!-- Routine Selector Bar (Shown on Tab 1 & Tab 2) -->
+          <div id="routineSelectorBar" class="p-4 bg-slate-900/30 border-b border-borderDark flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+              <label class="text-xs font-semibold text-slate-400 uppercase whitespace-nowrap">Routine :</label>
+              <select id="activeRoutineSelect" onchange="handleRoutineChange()" class="flex-1 bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-sm font-semibold text-white focus:outline-none focus:border-orange-500">
               </select>
             </div>
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700" title="Augmente automatiquement l'objectif (+1 rep) quand 100% des séries sont validées">
+                <input type="checkbox" id="autoLevelUpToggle" onchange="toggleAutoLevelUp(this.checked)" class="accent-orange-500 rounded" />
+                <span>Auto Level-Up (+1 rep)</span>
+              </label>
+              <button onclick="createNewRoutinePrompt()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1 transition">
+                <i data-lucide="Plus" class="w-3.5 h-3.5 text-orange-400"></i>
+                Nouvelle
+              </button>
+              <button onclick="deleteCurrentRoutine()" class="p-1.5 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Supprimer la routine">
+                <i data-lucide="Trash2" class="w-4 h-4"></i>
+              </button>
+            </div>
           </div>
 
-          <!-- ONGLET 1 : BILAN DE SÉANCE (REPS RÉUSSIES) -->
+          <!-- TAB 1: END OF SESSION LOGGING -->
           <div id="viewSessionLogging" class="p-5 space-y-5">
             <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/50 border border-borderDark rounded-xl p-3.5">
               <div>
-                <h2 class="text-sm font-bold text-white">Feuille de Séance : Objectif vs Réalisé</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Vos saisies sont sauvegardées en direct même si vous fermez la page.</p>
+                <h2 class="text-sm font-bold text-white">Feuille de Séance : Objectif vs Répétitions Réussies</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Tout ce que tu modifies ici est sauvegardé automatiquement.</p>
               </div>
-              <div class="flex items-center gap-2 flex-wrap">
-                <input type="date" id="sessionDateInput" onchange="handleDraftMetaChange()" class="bg-bgMain border border-borderDark rounded-xl px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:border-orange-500 mono" />
-                <button onclick="fillAllTargetReps()" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition flex items-center gap-1.5">
+              <div class="flex items-center gap-2">
+                <input type="date" id="sessionDateInput" class="bg-bgMain border border-borderDark rounded-xl px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:border-orange-500" />
+                <button onclick="fillAllTargetReps()" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-semibold transition flex items-center gap-1">
                   <i data-lucide="CheckCheck" class="w-3.5 h-3.5"></i>
-                  <span>Tout valider à 100%</span>
+                  Tout à 100%
                 </button>
               </div>
             </div>
 
-            <!-- Barre de progression en direct -->
+            <!-- Live Progress Bar -->
             <div class="bg-bgMain border border-borderDark rounded-xl p-4 space-y-2">
               <div class="flex items-center justify-between text-xs">
-                <span class="font-semibold text-slate-300">Progression globale de la séance</span>
-                <span id="liveSessionScoreText" class="mono font-bold text-orange-400">0 / 0 reps — 0%</span>
+                <span class="font-semibold text-slate-300">Progression de la séance</span>
+                <span id="liveSessionScoreText" class="mono font-bold text-orange-400">0 / 0 reps (0%)</span>
               </div>
               <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
                 <div id="liveSessionProgressBar" class="h-full bg-gradient-to-r from-orange-500 to-emerald-400 transition-all duration-300" style="width: 0%"></div>
               </div>
             </div>
 
-            <!-- Cartes des exercices de la séance -->
+            <!-- Exercises Cards -->
             <div id="sessionExercisesContainer" class="space-y-4"></div>
 
-            <!-- Note & Bouton Enregistrer -->
-            <div class="pt-3 border-t border-borderDark flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <input type="text" id="sessionNoteInput" oninput="handleDraftMetaChange()" placeholder="Note de fin de séance (ex: Bonne forme, RIR 1 sur la dernière série...)" class="flex-1 bg-bgMain border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500" />
-              <button onclick="saveCompletedSession()" class="px-5 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 transition shrink-0">
+            <!-- Submit Session -->
+            <div class="pt-2 border-t border-borderDark flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <input type="text" id="sessionNoteInput" placeholder="Note de séance (ex: Bonne congestion, RIR 1...)" class="flex-1 bg-bgMain border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500" />
+              <button onclick="saveCompletedSession()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-sm shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 transition">
                 <i data-lucide="Save" class="w-4 h-4"></i>
-                <span>Enregistrer la Séance</span>
+                <span>Valider & Enregistrer la Séance</span>
               </button>
             </div>
           </div>
 
-          <!-- ONGLET 2 : ÉDITER MA ROUTINE (OBJECTIFS) -->
+          <!-- TAB 2: ROUTINE BUILDER (WITH DROPDOWN EXERCISE LIST) -->
           <div id="viewRoutineBuilder" class="p-5 space-y-5 hidden">
-            <div class="bg-emerald-500/10 border border-emerald-500/25 rounded-xl p-3.5 flex items-start justify-between gap-3">
-              <div class="flex items-start gap-2.5">
-                <i data-lucide="ShieldCheck" class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5"></i>
-                <div class="text-xs text-slate-300 leading-relaxed">
-                  <strong class="text-white">Sauvegarde instantanée activée :</strong> Chaque ajout, suppression ou modification de séries, répétitions ou lest dans votre routine est immédiatement enregistré dans votre navigateur.
-                </div>
-              </div>
-            </div>
-
-            <!-- Formulaire d'ajout d'exercice avec LISTE DÉROULANTE (<select> + <optgroup>) -->
             <div class="bg-bgMain border border-borderDark rounded-xl p-4 space-y-3">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center gap-1.5">
-                <i data-lucide="PlusCircle" class="w-4 h-4"></i>
-                Ajouter un exercice à la routine active
-              </h3>
-
+              <h3 class="text-xs font-bold uppercase tracking-wider text-orange-400">Ajouter un exercice à la routine</h3>
               <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
                 <div class="sm:col-span-5">
-                  <label class="block text-[11px] text-slate-400 mb-1">Exercice (Liste par catégories)</label>
-                  <select id="newExSelect" onchange="toggleCustomExInput('newExSelect', 'newExCustomWrapper')" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-orange-500">
+                  <label class="block text-[11px] text-slate-400 mb-1">Choisir dans la liste déroulante</label>
+                  <select id="builderExerciseSelect" onchange="toggleBuilderCustomInput()" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-orange-500">
                   </select>
+                  <input type="text" id="builderCustomExName" placeholder="Nom de ton exercice personnalisé..." class="hidden mt-2 w-full bg-bgCard border border-orange-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none" />
                 </div>
                 <div class="sm:col-span-2">
-                  <label class="block text-[11px] text-slate-400 mb-1">Séries (Objectif)</label>
-                  <input type="number" id="newExSets" min="1" max="30" value="4" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white mono text-center focus:outline-none focus:border-orange-500" />
+                  <label class="block text-[11px] text-slate-400 mb-1">Séries (Obj.)</label>
+                  <input type="number" id="newExSets" min="1" max="20" value="4" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white mono focus:outline-none focus:border-orange-500" />
                 </div>
                 <div class="sm:col-span-2">
                   <label class="block text-[11px] text-slate-400 mb-1">Reps / Série</label>
-                  <input type="number" id="newExReps" min="1" max="500" value="10" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white mono text-center focus:outline-none focus:border-orange-500" />
+                  <input type="number" id="newExReps" min="1" max="300" value="10" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white mono focus:outline-none focus:border-orange-500" />
                 </div>
                 <div class="sm:col-span-3">
                   <label class="block text-[11px] text-slate-400 mb-1">Lest cible (kg)</label>
-                  <input type="number" id="newExWeight" min="0" max="250" step="0.5" value="0" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white mono text-center focus:outline-none focus:border-orange-500" />
+                  <input type="number" id="newExWeight" min="0" max="150" step="0.5" value="0" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white mono focus:outline-none focus:border-orange-500" />
                 </div>
               </div>
-
-              <!-- Champ texte affiché uniquement si "+ Exercice personnalisé..." est sélectionné -->
-              <div id="newExCustomWrapper" class="hidden pt-1">
-                <label class="block text-[11px] text-orange-300 mb-1">Nom de votre exercice personnalisé :</label>
-                <input type="text" id="newExCustomInput" placeholder="Ex: Hefesto, Tractions 1 bras élastique, Planche Lean..." class="w-full bg-bgCard border border-orange-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500" />
-              </div>
-
               <div class="flex justify-end pt-1">
-                <button onclick="addExerciseToRoutine()" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-xs font-bold text-white flex items-center gap-1.5 transition shadow-md shadow-orange-500/20">
+                <button onclick="addExerciseToRoutine()" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-xs font-bold text-white flex items-center gap-1.5 transition">
                   <i data-lucide="Plus" class="w-4 h-4"></i>
-                  <span>Ajouter à la routine</span>
+                  Ajouter à ma routine
                 </button>
               </div>
             </div>
 
-            <!-- Liste des exercices actuels de la routine -->
-            <div id="builderExercisesList" class="space-y-2.5"></div>
+            <!-- Exercises inside Active Routine -->
+            <div class="space-y-2.5" id="builderExercisesList"></div>
           </div>
 
-          <!-- ONGLET 3 : ENTRER UN MAX / HORS ROUTINE -->
+          <!-- TAB 3: TEST DE MAX / HORS ROUTINE -->
           <div id="viewMaxLogger" class="p-5 space-y-5 hidden">
-            <div class="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4 flex items-start gap-3">
-              <div class="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 shrink-0">
-                <i data-lucide="Trophy" class="w-5 h-5"></i>
-              </div>
+            <div class="bg-purple-500/10 border border-purple-500/25 rounded-xl p-3.5 flex items-start gap-3">
+              <i data-lucide="Zap" class="w-5 h-5 text-purple-400 shrink-0 mt-0.5"></i>
               <div class="text-xs text-slate-300 leading-relaxed">
-                <strong class="text-white block text-sm mb-0.5">Test de Max & Performance Hors Routine</strong>
-                Enregistrez un record sur 1 série, un maintien isométrique maximal (Front Lever, Planche, Handstand, L-Sit, Human Flag) ou un Max lesté réalisé en dehors de votre routine.
+                Enregistre ici un <strong>Max de répétitions sur 1 série</strong>, un <strong>Max lesté</strong> ou un <strong>Maintien statique maximal (en secondes)</strong> réalisé en dehors de ta routine. Il mettra directement à jour tes Records (PR) et ton graphique.
               </div>
             </div>
 
-            <div class="bg-bgMain border border-borderDark rounded-2xl p-4 space-y-4">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div class="bg-bgMain border border-borderDark rounded-xl p-4 space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1.5">Exercice ou Figure testé(e)</label>
-                  <select id="maxExSelect" onchange="toggleCustomExInput('maxExSelect', 'maxExCustomWrapper')" class="w-full bg-bgCard border border-borderDark rounded-xl px-3 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-purple-500">
+                  <label class="block text-[11px] text-slate-400 mb-1">Exercice ou Figure</label>
+                  <select id="maxExerciseSelect" onchange="toggleMaxCustomInput()" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-purple-500">
+                  </select>
+                  <input type="text" id="maxCustomExName" placeholder="Nom de l'exercice..." class="hidden mt-2 w-full bg-bgCard border border-purple-500/50 rounded-lg px-3 py-2 text-xs text-white focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Date du test</label>
+                  <input type="date" id="maxDateInput" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-purple-500" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Performance Max (Reps ou Sec)</label>
+                  <input type="number" id="maxValueInput" min="1" max="1000" value="15" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-sm font-extrabold text-purple-400 mono focus:outline-none focus:border-purple-500" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Unité</label>
+                  <select id="maxUnitSelect" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-purple-500">
+                    <option value="reps">Répétitions (Reps)</option>
+                    <option value="sec">Secondes (Maintien statique)</option>
                   </select>
                 </div>
-
                 <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1.5">Type de performance</label>
-                  <select id="maxTypeSelect" onchange="handleMaxTypeChange()" class="w-full bg-bgCard border border-borderDark rounded-xl px-3 py-2.5 text-xs font-semibold text-purple-300 focus:outline-none focus:border-purple-500">
-                    <option value="reps">Max Reps (1 série)</option>
-                    <option value="hold">Maintien Statique (Secondes)</option>
-                    <option value="weighted">Max Lesté (1RM / Série lestée)</option>
-                  </select>
+                  <label class="block text-[11px] text-slate-400 mb-1">Lest ajouté (kg)</label>
+                  <input type="number" id="maxWeightInput" min="0" max="200" step="0.5" value="0" class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-sm font-bold text-sky-400 mono focus:outline-none focus:border-purple-500" />
                 </div>
               </div>
 
-              <div id="maxExCustomWrapper" class="hidden">
-                <label class="block text-[11px] text-purple-300 mb-1">Nom de l'exercice ou figure personnalisé(e) :</label>
-                <input type="text" id="maxExCustomInput" placeholder="Ex: Maltese Hold, Victorian, Traction 1 bras stricte..." class="w-full bg-bgCard border border-purple-500/50 rounded-xl px-3 py-2 text-xs text-white focus:outline-none" />
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Note (optionnel)</label>
+                <input type="text" id="maxNoteInput" placeholder="Ex: Testé à frais, exécution stricte..." class="w-full bg-bgCard border border-borderDark rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500" />
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                <div>
-                  <label id="maxValueLabel" class="block text-xs font-semibold text-slate-300 mb-1.5">Score Max réalisé (Reps)</label>
-                  <input type="number" id="maxScoreInput" min="1" max="1000" value="15" class="w-full bg-bgCard border border-purple-500/40 rounded-xl px-3 py-2.5 text-base font-extrabold text-white mono text-center focus:outline-none focus:border-purple-500" />
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1.5">Lest additionnel (kg)</label>
-                  <input type="number" id="maxWeightInput" min="0" max="300" step="0.5" value="0" class="w-full bg-bgCard border border-borderDark rounded-xl px-3 py-2.5 text-base font-bold text-sky-400 mono text-center focus:outline-none focus:border-purple-500" />
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-slate-300 mb-1.5">Date du Max</label>
-                  <input type="date" id="maxDateInput" class="w-full bg-bgCard border border-borderDark rounded-xl px-3 py-2.5 text-xs font-semibold text-white mono focus:outline-none focus:border-purple-500" />
-                </div>
-              </div>
-
-              <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
-                <input type="text" id="maxNoteInput" placeholder="Note sur votre Max (ex: Forme stricte, validé à froid...)" class="flex-1 bg-bgCard border border-borderDark rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500" />
-                <button onclick="saveStandaloneMax()" class="px-5 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-500 hover:to-orange-600 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-500/25 flex items-center justify-center gap-2 transition shrink-0">
-                  <i data-lucide="Award" class="w-4 h-4"></i>
-                  <span>Enregistrer mon Max</span>
+              <div class="flex justify-end">
+                <button onclick="saveMaxRecord()" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/25 flex items-center gap-2 transition">
+                  <i data-lucide="Trophy" class="w-4 h-4"></i>
+                  Enregistrer ce Max Hors Routine
                 </button>
               </div>
             </div>
           </div>
-
         </div>
 
-        <!-- 4. SECTION DÉDIÉE : OBJECTIFS DE FIGURES & SKILLS -->
+        <!-- CARD 2: OBJECTIFS DE FIGURES & SKILLS -->
         <div class="bg-bgCard border border-borderDark rounded-2xl p-5 space-y-4 shadow-xl">
-          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-borderDark pb-3.5">
-            <div class="flex items-center gap-2.5">
-              <div class="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
-                <i data-lucide="Sparkles" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <h2 class="text-base font-bold text-white">Objectifs de Figures & Skills</h2>
-                <p class="text-xs text-slate-400">Suivez vos variantes (Tuck, Adv. Tuck, Straddle, Full) et validez votre progression</p>
-              </div>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="Sparkles" class="w-4 h-4 text-purple-400"></i>
+                Objectifs de Figures & Skills (Street Workout)
+              </h2>
+              <p class="text-xs text-slate-400">Suis tes figures statiques et dynamiques par variante (Tuck, Adv. Tuck, Straddle, Full)</p>
             </div>
-            <button onclick="toggleAddSkillForm()" class="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 text-xs font-bold flex items-center gap-1.5 transition">
+            <button onclick="toggleNewSkillForm()" class="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 text-xs font-bold flex items-center gap-1.5 transition">
               <i data-lucide="Plus" class="w-3.5 h-3.5"></i>
-              <span>+ Ajouter une Figure</span>
+              + Figure
             </button>
           </div>
 
-          <!-- Formulaire pliable d'ajout d'une Figure -->
-          <div id="addSkillFormBox" class="hidden bg-bgMain border border-purple-500/30 rounded-xl p-4 space-y-3">
-            <h3 class="text-xs font-bold uppercase text-purple-300">Nouvel objectif de figure</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+          <!-- Add New Skill Form (Collapsible) -->
+          <div id="newSkillForm" class="hidden bg-bgMain border border-purple-500/30 rounded-xl p-4 space-y-3">
+            <h3 class="text-xs font-bold uppercase text-purple-400">Ajouter un objectif de figure</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
               <div class="sm:col-span-4">
                 <label class="block text-[11px] text-slate-400 mb-1">Figure</label>
-                <select id="newSkillNameSelect" onchange="toggleCustomExInput('newSkillNameSelect', 'newSkillCustomWrapper')" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs font-semibold text-white focus:outline-none">
+                <select id="skillNameSelect" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs font-semibold text-white">
                   <option value="Muscle-Up Barre">Muscle-Up Barre</option>
                   <option value="Front Lever">Front Lever</option>
-                  <option value="Handstand Libre">Handstand Libre</option>
-                  <option value="Full Planche">Full Planche</option>
-                  <option value="L-Sit">L-Sit</option>
+                  <option value="Handstand (Équilibre)">Handstand (Équilibre)</option>
+                  <option value="Planche">Planche</option>
+                  <option value="L-Sit / V-Sit">L-Sit / V-Sit</option>
                   <option value="Back Lever">Back Lever</option>
                   <option value="Human Flag (Drapeau)">Human Flag (Drapeau)</option>
-                  <option value="Handstand Push-ups (HSPU)">Handstand Push-ups (HSPU)</option>
-                  <option value="__CUSTOM__">+ Figure personnalisée...</option>
+                  <option value="Handstand Push-Ups (HSPU)">Handstand Push-Ups (HSPU)</option>
+                  <option value="Pistol Squat">Pistol Squat</option>
                 </select>
               </div>
               <div class="sm:col-span-3">
                 <label class="block text-[11px] text-slate-400 mb-1">Variante actuelle</label>
-                <select id="newSkillVariantSelect" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs font-semibold text-purple-300 focus:outline-none">
+                <select id="skillVariantSelect" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs font-semibold text-white">
                   <option value="Tuck">Tuck</option>
                   <option value="Advanced Tuck">Advanced Tuck</option>
                   <option value="One Leg">One Leg</option>
                   <option value="Straddle">Straddle</option>
                   <option value="Half Lay">Half Lay</option>
-                  <option value="Full / Strict" selected>Full / Strict</option>
-                  <option value="Band Assisted">Band Assisted</option>
-                </select>
-              </div>
-              <div class="sm:col-span-2">
-                <label class="block text-[11px] text-slate-400 mb-1">Unité</label>
-                <select id="newSkillUnitSelect" class="w-full bg-bgCard border border-borderDark rounded-lg px-2 py-2 text-xs text-white focus:outline-none">
-                  <option value="sec">Secondes (sec)</option>
-                  <option value="reps">Répétitions (reps)</option>
+                  <option value="Full / Strict">Full / Strict</option>
+                  <option value="Élastique">Avec Élastique</option>
                 </select>
               </div>
               <div class="sm:col-span-3">
-                <label class="block text-[11px] text-slate-400 mb-1">Objectif cible</label>
-                <input type="number" id="newSkillTargetInput" min="1" max="600" value="15" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs text-white mono text-center focus:outline-none" />
+                <label class="block text-[11px] text-slate-400 mb-1">Objectif (Sec ou Reps)</label>
+                <input type="number" id="skillTargetInput" min="1" max="300" value="10" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs font-bold text-white mono" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] text-slate-400 mb-1">Unité</label>
+                <select id="skillUnitSelect" class="w-full bg-bgCard border border-borderDark rounded-lg px-2.5 py-2 text-xs font-semibold text-white">
+                  <option value="sec">sec</option>
+                  <option value="reps">reps</option>
+                </select>
               </div>
             </div>
-            <div id="newSkillCustomWrapper" class="hidden">
-              <input type="text" id="newSkillCustomInput" placeholder="Nom de votre figure personnalisée (ex: V-Sit, Iron Cross...)" class="w-full bg-bgCard border border-purple-500/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none" />
-            </div>
-            <div class="flex justify-end gap-2 pt-1">
-              <button onclick="toggleAddSkillForm()" class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs text-slate-300">Annuler</button>
-              <button onclick="addNewSkillGoal()" class="px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-xs font-bold text-white">Ajouter la figure</button>
+            <div class="flex justify-end gap-2">
+              <button onclick="addNewSkillGoal()" class="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-bold text-white">Ajouter la figure</button>
             </div>
           </div>
 
-          <!-- Grille des Cartes de Figures -->
-          <div id="skillsGridContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3.5"></div>
+          <!-- Skills Grid -->
+          <div id="skillsGridContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
         </div>
 
       </div>
 
-      <!-- 5. COLONNE DROITE : GRAPHIQUE CHART.JS + RECORDS (PR) + HISTORIQUE -->
+      <!-- RIGHT COLUMN (5 COLS): CHART, PRs & HISTORY -->
       <div class="lg:col-span-5 space-y-6">
 
-        <!-- CARTE GRAPHIQUE DE PROGRESSION -->
+        <!-- CHART.JS PROGRESSION -->
         <div class="bg-bgCard border border-borderDark rounded-2xl p-5 space-y-4 shadow-xl">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-base font-bold text-white flex items-center gap-2">
-                <i data-lucide="LineChart" class="w-4 h-4 text-orange-400"></i>
-                <span>Graphique de Progression</span>
-              </h2>
-              <p class="text-xs text-slate-400">Séances de routine & Records Hors Routine</p>
-            </div>
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="TrendingUp" class="w-4 h-4 text-orange-400"></i>
+              Graphique de Progression
+            </h2>
+            <p class="text-xs text-slate-400">Évolution de tes répétitions réussies, objectifs et tests de Max</p>
           </div>
 
-          <!-- Filtres du graphique -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
-              <label for="chartExerciseFilter" class="block text-[11px] text-slate-400 mb-1">Exercice ou Figure suivi(e)</label>
+              <label class="block text-[11px] text-slate-400 mb-1">Exercice suivi</label>
               <select id="chartExerciseFilter" onchange="updateProgressionChart()" class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-orange-500">
                 <option value="__ALL__">Toute la séance (Total Reps)</option>
               </select>
             </div>
             <div>
-              <label for="chartMetricFilter" class="block text-[11px] text-slate-400 mb-1">Indicateur</label>
+              <label class="block text-[11px] text-slate-400 mb-1">Indicateur</label>
               <select id="chartMetricFilter" onchange="updateProgressionChart()" class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-orange-500">
-                <option value="totalReps">Total Reps : Réussi vs Objectif</option>
-                <option value="maxReps">Max sur 1 série / Record (Reps ou Sec)</option>
-                <option value="maxWeight">Lest Max (kg)</option>
+                <option value="totalReps">Volume Total : Réussi vs Objectif</option>
+                <option value="maxReps">Max sur 1 Série (inclut Hors Routine)</option>
                 <option value="completionRate">Taux de réussite (%)</option>
               </select>
             </div>
           </div>
 
-          <!-- Canvas Chart.js -->
           <div class="bg-bgMain border border-borderDark rounded-xl p-3 h-64 relative">
             <canvas id="progressionChart"></canvas>
           </div>
         </div>
 
-        <!-- CARTE RECORDS PERSONNELS (PR) -->
-        <div class="bg-bgCard border border-borderDark rounded-2xl p-5 space-y-3 shadow-xl">
+        <!-- PERSONAL RECORDS (PR) -->
+        <div class="bg-bgCard border border-borderDark rounded-2xl p-5 space-y-3">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
               <i data-lucide="Award" class="w-4 h-4 text-amber-400"></i>
-              <span>Records Personnels (PR)</span>
+              Records Personnels (PR)
             </h3>
-            <span class="text-[11px] text-slate-400 mono">Meilleure Série & Volume</span>
+            <span class="text-[11px] text-slate-400">Séances + Tests de Max</span>
           </div>
-          <div id="prGridContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[300px] overflow-y-auto pr-1"></div>
+          <div id="prGridContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
         </div>
 
-        <!-- HISTORIQUE DES SÉANCES & MAX -->
-        <div class="bg-bgCard border border-borderDark rounded-2xl p-5 space-y-3 shadow-xl">
+        <!-- SESSION & MAX HISTORY -->
+        <div class="bg-bgCard border border-borderDark rounded-2xl p-5 space-y-3">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-bold text-white flex items-center gap-2">
               <i data-lucide="History" class="w-4 h-4 text-sky-400"></i>
-              <span>Historique des Séances & Max</span>
+              Historique (Séances & Max)
             </h3>
-            <span id="historyCountBadge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 mono">0</span>
+            <span id="historyCountBadge" class="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 mono">0</span>
           </div>
           <div id="sessionHistoryContainer" class="space-y-3 max-h-[420px] overflow-y-auto pr-1"></div>
         </div>
@@ -599,414 +444,321 @@
     </div>
   </main>
 
-  <!-- MODALE 1 : CLOUD SYNC & BACKUP (GITHUB PAGES) -->
-  <div id="cloudModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-bgCard border border-borderDark rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+  <!-- SYNC PC ↔ PHONE MODAL -->
+  <div id="syncModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-bgCard border border-borderDark rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-borderDark pb-3">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400">
-            <i data-lucide="CloudCog" class="w-5 h-5"></i>
+            <i data-lucide="Smartphone" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="text-base font-bold text-white">Cloud Sync & Backup (GitHub Pages)</h3>
-            <p class="text-xs text-slate-400">Sauvegarde locale immédiate + Synchronisation Cloud multi-appareils</p>
+            <h3 class="text-base font-bold text-white">Synchroniser PC ↔ Téléphone & Cloud</h3>
+            <p class="text-xs text-slate-400">Transfère tes routines et séances en 1 clic ou connecte Firebase</p>
           </div>
         </div>
-        <button onclick="closeCloudModal()" class="text-slate-400 hover:text-white p-1">
+        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white p-1">
           <i data-lucide="X" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <!-- Statut LocalStorage -->
-      <div class="bg-emerald-950/30 border border-emerald-500/30 rounded-xl p-3.5 flex items-center justify-between text-xs">
+      <!-- METHOD 1: INSTANT COPY / PASTE CODE (NO ACCOUNT NEEDED) -->
+      <div class="bg-bgMain border border-orange-500/30 rounded-xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-bold uppercase text-orange-400">Méthode 1 : Code de Transfert Instantané (Sans compte)</h4>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-orange-500/15 text-orange-300">Le plus rapide</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Clique sur <strong>Copier mon code</strong> sur ton PC, envoie-le-toi par message (Discord, WhatsApp, Notes) et colle-le ici sur ton téléphone :
+        </p>
+        <div class="flex gap-2">
+          <input type="text" id="syncCodeInput" placeholder="Colle ici le code de sauvegarde pour restaurer..." class="flex-1 bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono focus:outline-none focus:border-orange-500" />
+          <button onclick="copySyncCode()" class="px-3.5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs whitespace-nowrap flex items-center gap-1.5 transition">
+            <i data-lucide="Copy" class="w-3.5 h-3.5"></i>
+            Copier mon code
+          </button>
+          <button onclick="restoreFromSyncCode()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs whitespace-nowrap flex items-center gap-1.5 transition">
+            <i data-lucide="Check" class="w-3.5 h-3.5"></i>
+            Charger
+          </button>
+        </div>
+      </div>
+
+      <!-- METHOD 2: AUTOMATIC CLOUD FIREBASE REALTIME DB -->
+      <div class="bg-bgMain border border-borderDark rounded-xl p-4 space-y-3">
+        <h4 class="text-xs font-bold uppercase text-sky-400">Méthode 2 : Synchronisation Cloud Automatique (Firebase)</h4>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Si tu as créé une Realtime Database gratuite sur <a href="https://console.firebase.google.com/" target="_blank" class="text-sky-400 underline">Firebase</a>, colle son URL ci-dessous sur ton PC et sur ton téléphone pour qu'ils se synchronisent automatiquement :
+        </p>
+        <input type="url" id="cloudEndpointInput" placeholder="https://ton-projet-default-rtdb.europe-west1.firebasedatabase.app" class="w-full bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500" />
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="cloudUserKeyInput" value="mathis_sw" placeholder="Clé profil (ex: mathis_sw)" class="bg-bgCard border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono" />
+          <div class="flex gap-2">
+            <button onclick="pushToCloud(true)" class="flex-1 py-2 px-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs">Envoyer Cloud</button>
+            <button onclick="pullFromCloud(true)" class="flex-1 py-2 px-3 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-bold text-xs">Récupérer Cloud</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- METHOD 3: JSON FILE EXPORT / IMPORT -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-borderDark">
+        <span class="text-xs text-slate-400">Sauvegarde par fichier (.JSON) :</span>
         <div class="flex items-center gap-2">
-          <i data-lucide="HardDrive" class="w-4 h-4 text-emerald-400"></i>
-          <span class="text-slate-200 font-semibold">Stockage Navigateur (`localStorage`) :</span>
-        </div>
-        <span id="modalLastSavedText" class="font-bold text-emerald-400 mono">Actif & Instantané</span>
-      </div>
-
-      <!-- Configuration Cloud Externe (Firebase Realtime DB / REST JSON) -->
-      <div class="space-y-3">
-        <label class="block text-xs font-bold text-slate-200">
-          Synchronisation Cloud Multi-Appareils (Optionnel — Firebase Realtime DB / REST)
-        </label>
-        <input
-          type="url"
-          id="cloudEndpointInput"
-          placeholder="https://votre-projet-default-rtdb.europe-west1.firebasedatabase.app"
-          class="w-full bg-bgMain border border-borderDark rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-sky-500"
-        />
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-[11px] text-slate-400 mb-1">Clé Athlète (Identifiant unique)</label>
-            <input
-              type="text"
-              id="cloudUserKeyInput"
-              placeholder="ex: mathis_sw_pro"
-              class="w-full bg-bgMain border border-borderDark rounded-xl px-3 py-2 text-xs text-white mono focus:outline-none focus:border-sky-500"
-            />
-          </div>
-          <div class="flex items-end">
-            <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none pb-2">
-              <input type="checkbox" id="cloudAutoSyncCheckbox" checked class="rounded accent-orange-500 w-4 h-4" />
-              <span>Sync Cloud auto à chaque modif</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-          <button onclick="pushToExternalCloud(true)" class="py-2.5 px-4 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs flex items-center justify-center gap-2 transition">
-            <i data-lucide="UploadCloud" class="w-4 h-4"></i>
-            <span>Envoyer vers le Cloud</span>
+          <button onclick="exportDataJson()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+            <i data-lucide="Download" class="w-3.5 h-3.5 text-orange-400"></i> Exporter .JSON
           </button>
-          <button onclick="pullFromExternalCloud(true)" class="py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition">
-            <i data-lucide="DownloadCloud" class="w-4 h-4"></i>
-            <span>Récupérer depuis le Cloud</span>
-          </button>
-        </div>
-        <p id="cloudFeedbackMsg" class="text-xs font-medium text-center text-slate-400 min-h-[16px]"></p>
-      </div>
-
-      <!-- Export / Import JSON + Reset -->
-      <div class="border-t border-borderDark pt-4 space-y-3">
-        <p class="text-xs font-bold text-slate-200">Sauvegarde Fichier (`.json`) & Réinitialisation</p>
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="flex flex-wrap items-center gap-2">
-            <button onclick="exportDataJson()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition">
-              <i data-lucide="Download" class="w-3.5 h-3.5 text-orange-400"></i>
-              <span>Exporter .JSON</span>
-            </button>
-            <label class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition cursor-pointer">
-              <i data-lucide="Upload" class="w-3.5 h-3.5 text-emerald-400"></i>
-              <span>Importer .JSON</span>
-              <input type="file" accept=".json" onchange="importDataJson(event)" class="hidden" />
-            </label>
-          </div>
-
-          <button onclick="openResetDataModal()" class="px-3 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-1.5 transition">
-            <i data-lucide="RotateCcw" class="w-3.5 h-3.5"></i>
-            <span>Réinitialiser les données d'exemple</span>
-          </button>
+          <label class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="Upload" class="w-3.5 h-3.5 text-emerald-400"></i> Importer .JSON
+            <input type="file" accept=".json" onchange="importDataJson(event)" class="hidden" />
+          </label>
         </div>
       </div>
+
+      <p id="cloudFeedbackMsg" class="text-xs font-semibold text-center text-emerald-400 min-h-[18px]"></p>
     </div>
   </div>
 
-  <!-- MODALE 2 : CRÉER OU RENOMMER UNE ROUTINE -->
-  <div id="routineNameModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-bgCard border border-borderDark rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between">
-        <h3 id="routineNameModalTitle" class="text-base font-bold text-white">Nouvelle routine</h3>
-        <button onclick="closeRoutineNameModal()" class="text-slate-400 hover:text-white p-1">
-          <i data-lucide="X" class="w-5 h-5"></i>
-        </button>
-      </div>
-      <div>
-        <label class="block text-xs text-slate-400 mb-1.5">Nom de la routine</label>
-        <input type="text" id="routineNameModalInput" placeholder="Ex: Pull / Push Hypertrophie, Séance Force..." class="w-full bg-bgMain border border-borderDark rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500" />
-      </div>
-      <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeRoutineNameModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300">Annuler</button>
-        <button onclick="confirmRoutineNameModal()" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-xs font-bold text-white">Valider</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODALE 3 : SUPPRIMER LA ROUTINE -->
-  <div id="deleteRoutineModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-bgCard border border-borderDark rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-      <h3 class="text-base font-bold text-white">Supprimer la routine active ?</h3>
-      <p class="text-xs text-slate-400">Cette action supprimera uniquement le modèle de routine sélectionné. Votre historique de séances et vos records resteront conservés.</p>
-      <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeDeleteRoutineModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300">Annuler</button>
-        <button onclick="confirmDeleteRoutine()" class="px-4 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-xs font-bold text-white">Supprimer</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODALE 4 : CONFIRMATION RÉINITIALISATION -->
-  <div id="resetDataModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-bgCard border border-borderDark rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-      <h3 class="text-base font-bold text-white">Réinitialiser les données d'exemple ?</h3>
-      <p class="text-xs text-slate-400">Vos routines et séances actuelles seront remplacées par les données de démonstration initiales.</p>
-      <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeResetDataModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300">Annuler</button>
-        <button onclick="confirmResetData()" class="px-4 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-xs font-bold text-white">Tout réinitialiser</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- NOTIFICATION TOAST -->
+  <!-- TOAST -->
   <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
     <div class="bg-slate-900 border border-orange-500/40 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-semibold">
       <i data-lucide="Sparkles" class="w-4 h-4 text-orange-400"></i>
-      <span id="toastText">Action effectuée</span>
+      <span id="toastText">Sauvegardé</span>
     </div>
   </div>
 
-  <!-- SCRIPT PRINCIPAL 100% AUTONOME (GITHUB PAGES COMPATIBLE) -->
   <script>
-    const STORAGE_KEY = 'calisthenics_pro_standalone_v3';
-    const CLOUD_CFG_KEY = 'calisthenics_pro_cloud_cfg_v3';
+    const MASTER_STORAGE_KEY = 'calisthenics_pro_master_state';
+    const LEGACY_KEYS = [
+      'calisthenics_pro_v3_state',
+      'calisthenics_pro_v2_state',
+      'calisthenics_pro_v1_state',
+      'calisthenics_pro_state'
+    ];
+    const CLOUD_CONFIG_KEY = 'calisthenics_pro_cloud_cfg';
 
-    // Catalogue riche d'exercices avec <optgroup>
+    // Catalogue complet d'exercices pour la liste déroulante
     const EXERCISE_CATALOG = [
       {
-        category: "Tirage (Pull)",
+        category: 'Tirage (Pull)',
         items: [
-          "Tractions Pronation",
-          "Tractions Supination (Chin-ups)",
-          "Tractions Prise Neutre",
-          "Tractions Lestées",
-          "Tractions Archer",
-          "Tractions Explosives (Chest-to-bar)",
-          "Tractions Australiennes (Rowing)",
-          "Tractions à un bras (Assistées)"
+          'Tractions Pronation (Pull-Ups)',
+          'Tractions Supination (Chin-Ups)',
+          'Tractions Prise Neutre',
+          'Tractions Australiennes',
+          'Tractions Archer',
+          'Tractions Explosives (Chest-to-Bar)',
+          'Tractions Lestées',
+          'Front Lever Raises'
         ]
       },
       {
-        category: "Poussée (Push)",
+        category: 'Poussée (Push)',
         items: [
-          "Dips Barres Parallèles",
-          "Dips Lestés",
-          "Dips Anneaux",
-          "Straight Bar Dips (Barre droite)",
-          "Pompes Classiques",
-          "Pompes Déclinées",
-          "Pompes Diamant",
-          "Pompes Archer",
-          "Pike Push-ups",
-          "Handstand Push-ups (HSPU Mur)",
-          "Pseudo Planche Push-ups"
+          'Dips Barres Parallèles',
+          'Dips Barre Droite (Straight Bar)',
+          'Dips Lestés',
+          'Pompes Classiques',
+          'Pompes Déclinées',
+          'Pompes Diamant',
+          'Pike Push-Ups',
+          'Handstand Push-Ups (HSPU)',
+          'Pseudo Planche Push-Ups'
         ]
       },
       {
-        category: "Figures & Dynamique (Skills)",
+        category: 'Figures & Skills',
         items: [
-          "Muscle-Up Barre",
-          "Muscle-Up Anneaux",
-          "Front Lever Raises",
-          "Pull-Over",
-          "Skin the Cat",
-          "L-Sit Pull-ups",
-          "Front Lever Hold (sec)",
-          "Full Planche Hold (sec)",
-          "Handstand Libre Hold (sec)",
-          "L-Sit Hold (sec)",
-          "Human Flag Hold (sec)",
-          "Back Lever Hold (sec)"
+          'Muscle-Up Barre',
+          'Muscle-Up Anneaux',
+          'Front Lever (Maintien)',
+          'Back Lever (Maintien)',
+          'Handstand (Équilibre)',
+          'Planche (Maintien)',
+          'L-Sit / V-Sit',
+          'Human Flag (Drapeau)'
         ]
       },
       {
-        category: "Core & Jambes (Legs/Abs)",
+        category: 'Core & Jambes',
         items: [
-          "Toes-to-Bar (Relevés de jambes barre)",
-          "Dragon Flag",
-          "Gainage Hollow Body",
-          "Pistol Squat",
-          "Squat Bulgare",
-          "Extensions Mollets"
+          'Toes-to-Bar (Relevés de jambes)',
+          'Knee Raises (Relevés de genoux)',
+          'Dragon Flag',
+          'Hollow Body Hold',
+          'Pistol Squat',
+          'Squats Bulgare',
+          'Sissy Squat'
         ]
       }
     ];
 
-    const SKILL_VARIANTS = [
-      "Tuck",
-      "Advanced Tuck",
-      "One Leg",
-      "Straddle",
-      "Half Lay",
-      "Full / Strict",
-      "Band Assisted"
-    ];
-
-    // État par défaut
-    function getDefaultState() {
-      return {
-        activeRoutineId: 'routine_upper_1',
-        autoOverloadEnabled: true,
-        overloadMode: 'reps',
-        draftSession: null,
-        routines: [
-          {
-            id: 'routine_upper_1',
-            name: 'Full Upper — Supersets Antagonistes',
-            exercises: [
-              { id: 'ex_1', name: 'Tractions Pronation', targetSets: 4, targetReps: 10, targetWeight: 0 },
-              { id: 'ex_2', name: 'Dips Barres Parallèles', targetSets: 4, targetReps: 12, targetWeight: 0 },
-              { id: 'ex_3', name: 'Tractions Australiennes (Rowing)', targetSets: 4, targetReps: 12, targetWeight: 0 },
-              { id: 'ex_4', name: 'Pompes Déclinées', targetSets: 4, targetReps: 15, targetWeight: 0 }
-            ]
-          },
-          {
-            id: 'routine_force_lest',
-            name: 'Séance Force & Skills',
-            exercises: [
-              { id: 'ex_5', name: 'Muscle-Up Barre', targetSets: 4, targetReps: 4, targetWeight: 0 },
-              { id: 'ex_6', name: 'Tractions Lestées', targetSets: 4, targetReps: 6, targetWeight: 10 },
-              { id: 'ex_7', name: 'Dips Lestés', targetSets: 4, targetReps: 8, targetWeight: 15 }
-            ]
-          }
-        ],
-        skillGoals: [
-          { id: 'sk_1', name: 'Muscle-Up Barre', variant: 'Full / Strict', current: 5, target: 8, unit: 'reps' },
-          { id: 'sk_2', name: 'Front Lever', variant: 'Advanced Tuck', current: 12, target: 20, unit: 'sec' },
-          { id: 'sk_3', name: 'Handstand Libre', variant: 'Full / Strict', current: 22, target: 45, unit: 'sec' },
-          { id: 'sk_4', name: 'Full Planche', variant: 'Tuck', current: 10, target: 20, unit: 'sec' },
-          { id: 'sk_5', name: 'L-Sit', variant: 'Full / Strict', current: 20, target: 30, unit: 'sec' }
-        ],
-        sessions: [
-          {
-            id: 'sess_demo_1',
-            type: 'routine',
-            date: '2026-10-06',
-            routineId: 'routine_upper_1',
-            routineName: 'Full Upper — Supersets Antagonistes',
-            note: 'Bonne forme sur les 2 premières séries, congestion rapide.',
-            levelUps: [],
-            exercises: [
-              { name: 'Tractions Pronation', targetSets: 4, targetReps: 10, targetWeight: 0, achievedSets: [10, 10, 8, 7], actualWeight: 0 },
-              { name: 'Dips Barres Parallèles', targetSets: 4, targetReps: 12, targetWeight: 0, achievedSets: [12, 12, 11, 9], actualWeight: 0 },
-              { name: 'Tractions Australiennes (Rowing)', targetSets: 4, targetReps: 12, targetWeight: 0, achievedSets: [12, 12, 11, 10], actualWeight: 0 },
-              { name: 'Pompes Déclinées', targetSets: 4, targetReps: 15, targetWeight: 0, achievedSets: [15, 15, 13, 12], actualWeight: 0 }
-            ]
-          },
-          {
-            id: 'sess_demo_2',
-            type: 'routine',
-            date: '2026-10-09',
-            routineId: 'routine_upper_1',
-            routineName: 'Full Upper — Supersets Antagonistes',
-            note: 'Gainage plus solide, +3 reps au total sur les tractions !',
-            levelUps: [],
-            exercises: [
-              { name: 'Tractions Pronation', targetSets: 4, targetReps: 10, targetWeight: 0, achievedSets: [10, 10, 9, 9], actualWeight: 0 },
-              { name: 'Dips Barres Parallèles', targetSets: 4, targetReps: 12, targetWeight: 0, achievedSets: [12, 12, 12, 10], actualWeight: 0 },
-              { name: 'Tractions Australiennes (Rowing)', targetSets: 4, targetReps: 12, targetWeight: 0, achievedSets: [12, 12, 12, 11], actualWeight: 0 },
-              { name: 'Pompes Déclinées', targetSets: 4, targetReps: 15, targetWeight: 0, achievedSets: [15, 15, 14, 14], actualWeight: 0 }
-            ]
-          },
-          {
-            id: 'sess_demo_max_1',
-            type: 'max_test',
-            date: '2026-10-11',
-            routineId: 'hors_routine',
-            routineName: 'Test Max Hors Routine',
-            maxType: 'reps',
-            unit: 'reps',
-            note: 'Test de max tractions strictes à froid sur 1 série !',
-            levelUps: [],
-            exercises: [
-              { name: 'Tractions Pronation', targetSets: 1, targetReps: 16, targetWeight: 0, achievedSets: [16], actualWeight: 0 }
-            ]
-          },
-          {
-            id: 'sess_demo_3',
-            type: 'routine',
-            date: '2026-10-13',
-            routineId: 'routine_upper_1',
-            routineName: 'Full Upper — Supersets Antagonistes',
-            note: 'Dips et Tractions Australiennes validés à 100% !',
-            levelUps: ['Dips Barres Parallèles', 'Tractions Australiennes (Rowing)'],
-            exercises: [
-              { name: 'Tractions Pronation', targetSets: 4, targetReps: 10, targetWeight: 0, achievedSets: [10, 10, 10, 9], actualWeight: 0 },
-              { name: 'Dips Barres Parallèles', targetSets: 4, targetReps: 12, targetWeight: 0, achievedSets: [12, 12, 12, 12], actualWeight: 0 },
-              { name: 'Tractions Australiennes (Rowing)', targetSets: 4, targetReps: 12, targetWeight: 0, achievedSets: [12, 12, 12, 12], actualWeight: 0 },
-              { name: 'Pompes Déclinées', targetSets: 4, targetReps: 15, targetWeight: 0, achievedSets: [15, 15, 15, 14], actualWeight: 0 }
-            ]
-          }
-        ]
-      };
-    }
-
-    // CHARGEMENT DEPUIS LOCALSTORAGE (AVEC MIGRATION SI ANCIENNE VERSION V2 PRÉSENTE)
-    function loadState() {
-      try {
-        const rawV3 = localStorage.getItem(STORAGE_KEY);
-        if (rawV3) {
-          const parsed = JSON.parse(rawV3);
-          if (parsed && Array.isArray(parsed.routines) && Array.isArray(parsed.sessions)) {
-            if (!Array.isArray(parsed.skillGoals)) parsed.skillGoals = getDefaultState().skillGoals;
-            if (typeof parsed.autoOverloadEnabled !== 'boolean') parsed.autoOverloadEnabled = true;
-            if (!parsed.overloadMode) parsed.overloadMode = 'reps';
-            return parsed;
-          }
+    const defaultState = {
+      activeRoutineId: 'routine_upper_1',
+      autoLevelUp: true,
+      routines: [
+        {
+          id: 'routine_upper_1',
+          name: 'Full Upper — Supersets Antagonistes',
+          exercises: [
+            { id: 'ex_1', name: 'Tractions Pronation (Pull-Ups)', targetSets: 4, targetReps: 10, targetWeight: 0 },
+            { id: 'ex_2', name: 'Dips Barres Parallèles', targetSets: 4, targetReps: 12, targetWeight: 0 },
+            { id: 'ex_3', name: 'Tractions Australiennes', targetSets: 4, targetReps: 12, targetWeight: 0 },
+            { id: 'ex_4', name: 'Pompes Classiques', targetSets: 4, targetReps: 15, targetWeight: 0 }
+          ]
+        },
+        {
+          id: 'routine_force',
+          name: 'Séance Force & Skills',
+          exercises: [
+            { id: 'ex_5', name: 'Muscle-Up Barre', targetSets: 4, targetReps: 4, targetWeight: 0 },
+            { id: 'ex_6', name: 'Tractions Lestées', targetSets: 4, targetReps: 6, targetWeight: 10 },
+            { id: 'ex_7', name: 'Dips Lestés', targetSets: 4, targetReps: 8, targetWeight: 15 }
+          ]
         }
-        // Fallback migration si l'utilisateur avait déjà enregistré en v2
-        const rawV2 = localStorage.getItem('calisthenics_pro_v2_state');
-        if (rawV2) {
-          const parsedV2 = JSON.parse(rawV2);
-          if (parsedV2 && Array.isArray(parsedV2.routines)) {
-            return {
-              ...getDefaultState(),
-              ...parsedV2,
-              skillGoals: parsedV2.skillGoals || getDefaultState().skillGoals
-            };
-          }
+      ],
+      skills: [
+        { id: 'sk_1', name: 'Muscle-Up Barre', variant: 'Full / Strict', current: 3, target: 5, unit: 'reps' },
+        { id: 'sk_2', name: 'Front Lever', variant: 'Advanced Tuck', current: 10, target: 15, unit: 'sec' },
+        { id: 'sk_3', name: 'Handstand (Équilibre)', variant: 'Full / Strict', current: 15, target: 30, unit: 'sec' },
+        { id: 'sk_4', name: 'L-Sit / V-Sit', variant: 'Full / Strict', current: 15, target: 25, unit: 'sec' }
+      ],
+      sessions: [
+        {
+          id: 'sess_init_1',
+          type: 'routine',
+          date: '2026-10-12',
+          routineId: 'routine_upper_1',
+          routineName: 'Full Upper — Supersets Antagonistes',
+          note: 'Séance de référence enregistrée.',
+          exercises: [
+            { name: 'Tractions Pronation (Pull-Ups)', targetSets: 4, targetReps: 10, targetWeight: 0, achievedSets: [10, 10, 9, 8], actualWeight: 0 },
+            { name: 'Dips Barres Parallèles', targetSets: 4, targetReps: 12, targetWeight: 0, achievedSets: [12, 12, 12, 10], actualWeight: 0 },
+            { name: 'Tractions Australiennes', targetSets: 4, targetReps: 12, targetWeight: 0, achievedSets: [12, 12, 12, 12], actualWeight: 0 },
+            { name: 'Pompes Classiques', targetSets: 4, targetReps: 15, targetWeight: 0, achievedSets: [15, 15, 15, 14], actualWeight: 0 }
+          ]
         }
-      } catch (err) {
-        console.error('Erreur lecture localStorage:', err);
-      }
-      return getDefaultState();
-    }
+      ]
+    };
 
-    let appState = loadState();
+    let appState = loadAndRecoverState();
     let currentSessionDraft = [];
     let chartInstance = null;
-    let routineModalMode = 'create'; // 'create' | 'rename'
-    let cloudSyncDebounce = null;
 
-    // SAUVEGARDE IMMÉDIATE & SYNCHRONE DANS LOCALSTORAGE (FIX GITHUB PAGES)
-    function saveState(silent = false) {
+    // Timer variables
+    let timerMode = 'rest'; // 'rest' or 'hold'
+    let timerSeconds = 90;
+    let timerInterval = null;
+
+    // Récupération intelligente (fouille toutes les anciennes clés localStorage sur le PC)
+    function loadAndRecoverState() {
       try {
-        // Synchroniser le brouillon de séance en cours dans appState avant d'écrire
-        const dateEl = document.getElementById('sessionDateInput');
-        const noteEl = document.getElementById('sessionNoteInput');
-        appState.draftSession = {
-          routineId: appState.activeRoutineId,
-          date: dateEl ? dateEl.value : new Date().toISOString().slice(0, 10),
-          note: noteEl ? noteEl.value : '',
-          exercises: currentSessionDraft
-        };
-
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-
-        const nowStr = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        const statusText = document.getElementById('saveStatusText');
-        const modalSaved = document.getElementById('modalLastSavedText');
-        const badgeBox = document.getElementById('saveBadgeContainer');
-
-        if (statusText) statusText.textContent = `✓ Sauvegardé • ${nowStr}`;
-        if (modalSaved) modalSaved.textContent = `Sauvegardé à ${nowStr}`;
-
-        if (!silent && badgeBox) {
-          badgeBox.classList.remove('save-flash');
-          void badgeBox.offsetWidth;
-          badgeBox.classList.add('save-flash');
+        const masterRaw = localStorage.getItem(MASTER_STORAGE_KEY);
+        if (masterRaw) {
+          const parsed = JSON.parse(masterRaw);
+          if (parsed && Array.isArray(parsed.routines)) return normalizeState(parsed);
         }
+        // Sinon, cherche dans les anciennes clés des versions précédentes
+        for (const key of LEGACY_KEYS) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && Array.isArray(parsed.routines)) {
+              const normalized = normalizeState(parsed);
+              localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(normalized));
+              return normalized;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Erreur lecture localStorage:', e);
+      }
+      const initial = JSON.parse(JSON.stringify(defaultState));
+      localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(initial));
+      return initial;
+    }
 
-        // Si un Cloud externe est configuré avec autoSync, on synchronise en arrière-plan
+    function normalizeState(st) {
+      if (!Array.isArray(st.skills)) st.skills = JSON.parse(JSON.stringify(defaultState.skills));
+      if (typeof st.autoLevelUp !== 'boolean') st.autoLevelUp = true;
+      if (Array.isArray(st.draft) && st.draft.length > 0) {
+        currentSessionDraft = st.draft;
+      }
+      return st;
+    }
+
+    function saveStateImmediate() {
+      try {
+        appState.draft = currentSessionDraft;
+        localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(appState));
+        const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const badge = document.getElementById('saveIndicatorBadge');
+        if (badge) badge.textContent = `✓ Sauvegardé • ${now}`;
+
         const cfg = getCloudConfig();
-        if (cfg.endpoint && cfg.autoSync) {
-          clearTimeout(cloudSyncDebounce);
-          cloudSyncDebounce = setTimeout(() => pushToExternalCloud(false), 700);
-        }
-      } catch (err) {
-        console.error('Erreur écriture localStorage:', err);
+        if (cfg.endpoint) pushToCloud(false);
+      } catch (e) {
+        console.error('Erreur sauvegarde:', e);
       }
     }
 
-    function manualSaveTrigger() {
-      saveState(false);
-      showToast('Toutes vos routines, figures et séances sont sauvegardées sur cet appareil !');
+    function populateExerciseSelects() {
+      const selects = [
+        document.getElementById('builderExerciseSelect'),
+        document.getElementById('maxExerciseSelect')
+      ];
+      selects.forEach(sel => {
+        if (!sel) return;
+        sel.innerHTML = '';
+        EXERCISE_CATALOG.forEach(group => {
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = group.category;
+          group.items.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item;
+            opt.textContent = item;
+            optgroup.appendChild(opt);
+          });
+          sel.appendChild(optgroup);
+        });
+        const customOpt = document.createElement('option');
+        customOpt.value = '__CUSTOM__';
+        customOpt.textContent = '+ Exercice personnalisé...';
+        sel.appendChild(customOpt);
+      });
     }
 
-    // Garantie supplémentaire à la fermeture de l'onglet ou changement d'application mobile
-    window.addEventListener('beforeunload', () => saveState(true));
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') saveState(true);
-    });
+    function buildExerciseSelectHtml(selectedName, exIdx) {
+      let foundInCatalog = false;
+      let html = `<select onchange="handleBuilderRowExerciseChange(${exIdx}, this.value)" class="bg-bgMain border border-borderDark rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-orange-500">`;
+      EXERCISE_CATALOG.forEach(group => {
+        html += `<optgroup label="${group.category}">`;
+        group.items.forEach(item => {
+          const isSel = item === selectedName;
+          if (isSel) foundInCatalog = true;
+          html += `<option value="${item}" ${isSel ? 'selected' : ''}>${item}</option>`;
+        });
+        html += `</optgroup>`;
+      });
+      if (!foundInCatalog) {
+        html += `<option value="${selectedName}" selected>${selectedName}</option>`;
+      }
+      html += `<option value="__CUSTOM__">+ Personnalisé...</option></select>`;
+      return html;
+    }
+
+    function toggleBuilderCustomInput() {
+      const sel = document.getElementById('builderExerciseSelect');
+      const inp = document.getElementById('builderCustomExName');
+      inp.classList.toggle('hidden', sel.value !== '__CUSTOM__');
+      if (sel.value === '__CUSTOM__') inp.focus();
+    }
+
+    function toggleMaxCustomInput() {
+      const sel = document.getElementById('maxExerciseSelect');
+      const inp = document.getElementById('maxCustomExName');
+      inp.classList.toggle('hidden', sel.value !== '__CUSTOM__');
+      if (sel.value === '__CUSTOM__') inp.focus();
+    }
 
     function getActiveRoutine() {
       let r = appState.routines.find(item => item.id === appState.activeRoutineId);
@@ -1017,47 +769,16 @@
       return r;
     }
 
-    // Initialise ou restaure le brouillon de séance pour la routine active
-    function initOrSyncSessionDraft(forceResetFromRoutine = false) {
+    function initSessionDraftFromRoutine(forceReset = false) {
       const routine = getActiveRoutine();
       if (!routine) {
         currentSessionDraft = [];
         return;
       }
-
-      // Si on a un brouillon sauvegardé correspondant à la même routine et qu'on ne force pas le reset
-      if (
-        !forceResetFromRoutine &&
-        appState.draftSession &&
-        appState.draftSession.routineId === routine.id &&
-        Array.isArray(appState.draftSession.exercises) &&
-        appState.draftSession.exercises.length === routine.exercises.length
-      ) {
-        // Met à jour les noms et objectifs depuis la routine tout en gardant les répétitions déjà saisies
-        currentSessionDraft = routine.exercises.map((rEx, idx) => {
-          const savedDraftEx = appState.draftSession.exercises[idx];
-          const targetSetsCount = Number(rEx.targetSets) || 4;
-          const targetRepsCount = Number(rEx.targetReps) || 10;
-
-          let achieved = Array.isArray(savedDraftEx?.achievedSets) ? [...savedDraftEx.achievedSets] : [];
-          // Ajuster la taille du tableau si le nombre de séries cible a changé dans l'éditeur
-          while (achieved.length < targetSetsCount) achieved.push(targetRepsCount);
-          if (achieved.length > targetSetsCount) achieved = achieved.slice(0, targetSetsCount);
-
-          return {
-            id: rEx.id,
-            name: rEx.name,
-            targetSets: targetSetsCount,
-            targetReps: targetRepsCount,
-            targetWeight: Number(rEx.targetWeight) || 0,
-            actualWeight: savedDraftEx?.actualWeight ?? (Number(rEx.targetWeight) || 0),
-            achievedSets: achieved
-          };
-        });
+      if (!forceReset && Array.isArray(appState.draft) && appState.draft.length === routine.exercises.length) {
+        currentSessionDraft = appState.draft;
         return;
       }
-
-      // Sinon on crée un brouillon neuf calqué sur la routine active
       currentSessionDraft = routine.exercises.map(ex => ({
         id: ex.id,
         name: ex.name,
@@ -1067,56 +788,11 @@
         actualWeight: Number(ex.targetWeight) || 0,
         achievedSets: Array.from({ length: Number(ex.targetSets) || 4 }, () => Number(ex.targetReps) || 10)
       }));
-    }
-
-    function handleDraftMetaChange() {
-      saveState(true);
-    }
-
-    // Génère les options HTML (<optgroup>) pour les listes déroulantes d'exercices
-    function buildExerciseSelectOptionsHtml(selectedValue = '') {
-      let foundInCatalog = false;
-      let html = '';
-
-      EXERCISE_CATALOG.forEach(group => {
-        html += `<optgroup label="${group.category}">`;
-        group.items.forEach(item => {
-          const isSelected = item === selectedValue;
-          if (isSelected) foundInCatalog = true;
-          html += `<option value="${item}" ${isSelected ? 'selected' : ''}>${item}</option>`;
-        });
-        html += `</optgroup>`;
-      });
-
-      if (selectedValue && !foundInCatalog && selectedValue !== '__CUSTOM__') {
-        html = `<optgroup label="Exercice Personnalisé"><option value="${selectedValue}" selected>${selectedValue}</option></optgroup>` + html;
-      }
-
-      html += `<optgroup label="Personnalisé"><option value="__CUSTOM__">+ Exercice personnalisé...</option></optgroup>`;
-      return html;
-    }
-
-    function populateStaticExerciseDropdowns() {
-      const newExSelect = document.getElementById('newExSelect');
-      const maxExSelect = document.getElementById('maxExSelect');
-      if (newExSelect) newExSelect.innerHTML = buildExerciseSelectOptionsHtml('Tractions Pronation');
-      if (maxExSelect) maxExSelect.innerHTML = buildExerciseSelectOptionsHtml('Tractions Pronation');
-    }
-
-    function toggleCustomExInput(selectId, wrapperId) {
-      const sel = document.getElementById(selectId);
-      const wrap = document.getElementById(wrapperId);
-      if (!sel || !wrap) return;
-      if (sel.value === '__CUSTOM__') {
-        wrap.classList.remove('hidden');
-      } else {
-        wrap.classList.add('hidden');
-      }
+      saveStateImmediate();
     }
 
     function renderRoutineSelect() {
       const select = document.getElementById('activeRoutineSelect');
-      if (!select) return;
       select.innerHTML = '';
       appState.routines.forEach(r => {
         const opt = document.createElement('option');
@@ -1125,123 +801,87 @@
         if (r.id === appState.activeRoutineId) opt.selected = true;
         select.appendChild(opt);
       });
+      document.getElementById('autoLevelUpToggle').checked = appState.autoLevelUp !== false;
+    }
 
-      const autoToggle = document.getElementById('autoOverloadToggle');
-      const modeSelect = document.getElementById('overloadModeSelect');
-      if (autoToggle) autoToggle.checked = appState.autoOverloadEnabled !== false;
-      if (modeSelect) modeSelect.value = appState.overloadMode || 'reps';
+    function toggleAutoLevelUp(checked) {
+      appState.autoLevelUp = checked;
+      saveStateImmediate();
+      showToast(checked ? 'Auto Level-Up activé (+1 rep si 100% validé)' : 'Auto Level-Up désactivé');
     }
 
     function handleRoutineChange() {
-      const select = document.getElementById('activeRoutineSelect');
-      appState.activeRoutineId = select.value;
-      initOrSyncSessionDraft(true);
-      saveState();
-      refreshAllDashboardViews();
-      showToast('Routine active changée et sauvegardée.');
-    }
-
-    function handleOverloadSettingChange() {
-      const autoToggle = document.getElementById('autoOverloadToggle');
-      const modeSelect = document.getElementById('overloadModeSelect');
-      appState.autoOverloadEnabled = autoToggle ? autoToggle.checked : true;
-      appState.overloadMode = modeSelect ? modeSelect.value : 'reps';
-      saveState();
+      appState.activeRoutineId = document.getElementById('activeRoutineSelect').value;
+      initSessionDraftFromRoutine(true);
       renderSessionLoggingView();
+      renderRoutineBuilderView();
     }
 
-    // Navigation entre les 3 onglets
     function switchMainTab(tab) {
-      const viewSession = document.getElementById('viewSessionLogging');
-      const viewBuilder = document.getElementById('viewRoutineBuilder');
-      const viewMax = document.getElementById('viewMaxLogger');
-      const routineBar = document.getElementById('routineSelectorBar');
+      const vSession = document.getElementById('viewSessionLogging');
+      const vBuilder = document.getElementById('viewRoutineBuilder');
+      const vMax = document.getElementById('viewMaxLogger');
+      const bar = document.getElementById('routineSelectorBar');
 
-      const btnSession = document.getElementById('tabBtnSession');
-      const btnBuilder = document.getElementById('tabBtnBuilder');
-      const btnMax = document.getElementById('tabBtnMax');
+      const bSession = document.getElementById('tabBtnSession');
+      const bBuilder = document.getElementById('tabBtnBuilder');
+      const bMax = document.getElementById('tabBtnMax');
 
-      const inactiveClass = 'py-3.5 px-3 text-xs font-bold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition';
-      const activeOrangeClass = 'py-3.5 px-3 text-xs font-bold flex items-center justify-center gap-1.5 border-b-2 border-orange-500 text-orange-400 bg-orange-500/5 transition';
-      const activePurpleClass = 'py-3.5 px-3 text-xs font-bold flex items-center justify-center gap-1.5 border-b-2 border-purple-500 text-purple-300 bg-purple-500/10 transition';
+      const inactiveClass = 'py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white transition';
+      const activeOrange = 'py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-orange-500 text-orange-400 bg-orange-500/5 transition';
+      const activePurple = 'py-3.5 px-2 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 border-b-2 border-purple-500 text-purple-400 bg-purple-500/5 transition';
 
-      viewSession.classList.add('hidden');
-      viewBuilder.classList.add('hidden');
-      viewMax.classList.add('hidden');
-
-      btnSession.className = inactiveClass;
-      btnBuilder.className = inactiveClass;
-      btnMax.className = inactiveClass;
+      vSession.classList.add('hidden');
+      vBuilder.classList.add('hidden');
+      vMax.classList.add('hidden');
+      bSession.className = inactiveClass;
+      bBuilder.className = inactiveClass;
+      bMax.className = inactiveClass;
 
       if (tab === 'session') {
-        viewSession.classList.remove('hidden');
-        routineBar.classList.remove('hidden');
-        btnSession.className = activeOrangeClass;
+        vSession.classList.remove('hidden');
+        bar.classList.remove('hidden');
+        bSession.className = activeOrange;
         renderSessionLoggingView();
       } else if (tab === 'builder') {
-        viewBuilder.classList.remove('hidden');
-        routineBar.classList.remove('hidden');
-        btnBuilder.className = activeOrangeClass;
+        vBuilder.classList.remove('hidden');
+        bar.classList.remove('hidden');
+        bBuilder.className = activeOrange;
         renderRoutineBuilderView();
-      } else if (tab === 'max') {
-        viewMax.classList.remove('hidden');
-        routineBar.classList.add('hidden');
-        btnMax.className = activePurpleClass;
+      } else {
+        vMax.classList.remove('hidden');
+        bar.classList.add('hidden');
+        bMax.className = activePurple;
       }
       lucide.createIcons();
     }
 
-    function isExerciseEligibleForLevelUp(ex) {
-      if (!ex.achievedSets || ex.achievedSets.length < ex.targetSets) return false;
-      return ex.achievedSets.every(rep => (Number(rep) || 0) >= ex.targetReps);
-    }
-
-    // RENDU ONGLET 1 : BILAN DE SÉANCE
+    // TAB 1: SESSION LOGGING
     function renderSessionLoggingView() {
       const container = document.getElementById('sessionExercisesContainer');
-      if (!container) return;
       container.innerHTML = '';
 
-      const autoOverloadOn = appState.autoOverloadEnabled !== false;
-      const overloadMode = appState.overloadMode || 'reps';
-
       if (currentSessionDraft.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-8 text-slate-400 text-xs">
-            Aucun exercice dans cette routine. Cliquez sur l'onglet <strong>2. Éditer Ma Routine (Objectifs)</strong> pour ajouter vos exercices.
-          </div>
-        `;
+        container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">Aucun exercice dans cette routine. Va dans <strong>2. Éditer Routine</strong>.</div>`;
         updateLiveSessionSummary();
         return;
       }
 
       currentSessionDraft.forEach((ex, exIdx) => {
         const targetTotal = ex.targetSets * ex.targetReps;
-        const achievedTotal = ex.achievedSets.reduce((sum, val) => sum + (Number(val) || 0), 0);
+        const achievedTotal = ex.achievedSets.reduce((s, v) => s + (Number(v) || 0), 0);
         const pct = targetTotal > 0 ? Math.round((achievedTotal / targetTotal) * 100) : 0;
-        const qualifiesLevelUp = isExerciseEligibleForLevelUp(ex);
+        const allSetsValidated = ex.achievedSets.every(v => Number(v) >= ex.targetReps);
 
-        const nextTargetText = overloadMode === 'weight'
-          ? `+2.5 kg (prochain: ${ex.targetWeight + 2.5} kg)`
-          : `+1 rep/série (prochain: ${ex.targetSets}×${ex.targetReps + 1})`;
-
-        const levelUpBadgeHtml = (autoOverloadOn && qualifiesLevelUp)
-          ? `<span id="exLevelUp_${exIdx}" class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-               🔥 Éligible Level-Up ${nextTargetText}
-             </span>`
-          : `<span id="exLevelUp_${exIdx}" class="text-[11px] text-slate-400 mono">
-               ${achievedTotal - targetTotal >= 0 ? 'Objectif atteint' : (achievedTotal - targetTotal) + ' reps vs cible'}
-             </span>`;
-
-        const setsInputsHtml = ex.achievedSets.map((repVal, setIdx) => {
-          const isSetSuccess = (Number(repVal) || 0) >= ex.targetReps;
+        const setsHtml = ex.achievedSets.map((repVal, setIdx) => {
+          const ok = repVal >= ex.targetReps;
           return `
-            <div class="flex flex-col items-center bg-bgMain border ${isSetSuccess ? 'border-emerald-500/40' : 'border-borderDark'} rounded-xl p-2">
+            <div class="flex flex-col items-center bg-bgMain border ${ok ? 'border-emerald-500/40' : 'border-borderDark'} rounded-xl p-2">
               <span class="text-[10px] font-bold uppercase text-slate-400 mb-1">Série ${setIdx + 1}</span>
               <input
                 type="number"
                 min="0"
-                max="500"
+                max="300"
                 value="${repVal}"
                 oninput="updateDraftSetRep(${exIdx}, ${setIdx}, this.value)"
                 class="w-full text-center bg-bgCard border border-borderDark rounded-lg py-1.5 text-sm font-extrabold mono text-white focus:outline-none focus:border-orange-500"
@@ -1258,41 +898,27 @@
             <div class="flex items-center gap-2 flex-wrap">
               <span class="w-6 h-6 rounded-lg bg-orange-500/15 text-orange-400 font-bold text-xs flex items-center justify-center mono">${exIdx + 1}</span>
               <h3 class="text-sm font-bold text-white">${ex.name}</h3>
-              <span class="text-xs px-2.5 py-0.5 rounded-md bg-slate-800 text-slate-300 mono">
-                Objectif : ${ex.targetSets} × ${ex.targetReps} reps (+${ex.targetWeight}kg)
+              <span class="text-xs px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 mono">
+                Obj : ${ex.targetSets} × ${ex.targetReps} ${ex.targetWeight > 0 ? '(+' + ex.targetWeight + 'kg)' : ''}
               </span>
+              ${allSetsValidated && appState.autoLevelUp ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">🔥 Level-Up prêt</span>` : ''}
             </div>
-
             <div class="flex items-center gap-2">
-              <span id="exSummary_${exIdx}" class="mono text-xs font-extrabold text-white">${achievedTotal}/${targetTotal} (${pct}%)</span>
-              <button onclick="setExerciseFullTarget(${exIdx})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-500/20 text-[11px] font-semibold text-slate-300 hover:text-emerald-300 transition">
-                100% Obj
-              </button>
+              <span id="exSummary_${exIdx}" class="mono text-xs font-bold text-white">${achievedTotal}/${targetTotal} (${pct}%)</span>
+              <button onclick="setExerciseFullTarget(${exIdx})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-500/20 text-[11px] font-semibold text-slate-300 hover:text-emerald-300 transition">100%</button>
             </div>
           </div>
-
           <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
-            ${setsInputsHtml}
+            ${setsHtml}
           </div>
-
-          <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
-            <div>${levelUpBadgeHtml}</div>
-            <div class="flex items-center gap-3">
-              <div class="flex items-center gap-1.5 text-slate-400">
-                <span>Lest (kg) :</span>
-                <input
-                  type="number"
-                  step="0.5"
-                  min="0"
-                  value="${ex.actualWeight}"
-                  oninput="updateDraftWeight(${exIdx}, this.value)"
-                  class="w-16 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs text-white mono text-center focus:outline-none focus:border-orange-500"
-                />
-              </div>
-              <div class="flex items-center gap-1">
-                <button onclick="addExtraSetToDraft(${exIdx})" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 transition">+ 1 série</button>
-                <button onclick="removeLastSetFromDraft(${exIdx})" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-400 transition">- 1 série</button>
-              </div>
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-slate-400">
+            <div class="flex items-center gap-2">
+              <span>Lest réalisé (kg) :</span>
+              <input type="number" step="0.5" min="0" value="${ex.actualWeight}" oninput="updateDraftWeight(${exIdx}, this.value)" class="w-20 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs text-white mono" />
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="addExtraSetToDraft(${exIdx})" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300">+ 1 série</button>
+              <button onclick="removeLastSetFromDraft(${exIdx})" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-400">- 1 série</button>
             </div>
           </div>
         `;
@@ -1304,47 +930,26 @@
     }
 
     function updateDraftSetRep(exIdx, setIdx, val) {
-      const num = Math.max(0, parseInt(val, 10) || 0);
-      currentSessionDraft[exIdx].achievedSets[setIdx] = num;
-
+      currentSessionDraft[exIdx].achievedSets[setIdx] = Math.max(0, parseInt(val, 10) || 0);
       const ex = currentSessionDraft[exIdx];
       const targetTotal = ex.targetSets * ex.targetReps;
       const achievedTotal = ex.achievedSets.reduce((s, v) => s + (Number(v) || 0), 0);
       const pct = targetTotal > 0 ? Math.round((achievedTotal / targetTotal) * 100) : 0;
-
       const summaryEl = document.getElementById(`exSummary_${exIdx}`);
       if (summaryEl) summaryEl.textContent = `${achievedTotal}/${targetTotal} (${pct}%)`;
-
-      const levelUpEl = document.getElementById(`exLevelUp_${exIdx}`);
-      const autoOverloadOn = appState.autoOverloadEnabled !== false;
-      const overloadMode = appState.overloadMode || 'reps';
-
-      if (levelUpEl) {
-        if (autoOverloadOn && isExerciseEligibleForLevelUp(ex)) {
-          const nextTargetText = overloadMode === 'weight'
-            ? `+2.5 kg (prochain: ${ex.targetWeight + 2.5} kg)`
-            : `+1 rep/série (prochain: ${ex.targetSets}×${ex.targetReps + 1})`;
-          levelUpEl.className = 'inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-          levelUpEl.textContent = `🔥 Éligible Level-Up ${nextTargetText}`;
-        } else {
-          levelUpEl.className = 'text-[11px] text-slate-400 mono';
-          levelUpEl.textContent = achievedTotal - targetTotal >= 0 ? 'Objectif atteint' : `${achievedTotal - targetTotal} reps vs cible`;
-        }
-      }
-
       updateLiveSessionSummary();
-      saveState(true);
+      saveStateImmediate();
     }
 
     function updateDraftWeight(exIdx, val) {
       currentSessionDraft[exIdx].actualWeight = Math.max(0, parseFloat(val) || 0);
-      saveState(true);
+      saveStateImmediate();
     }
 
     function setExerciseFullTarget(exIdx) {
       const ex = currentSessionDraft[exIdx];
       ex.achievedSets = ex.achievedSets.map(() => ex.targetReps);
-      saveState();
+      saveStateImmediate();
       renderSessionLoggingView();
     }
 
@@ -1352,130 +957,94 @@
       currentSessionDraft.forEach(ex => {
         ex.achievedSets = ex.achievedSets.map(() => ex.targetReps);
       });
-      saveState();
+      saveStateImmediate();
       renderSessionLoggingView();
-      showToast('Toutes les séries ont été remplies à 100 % de votre objectif !');
+      showToast('Toutes les séries sont validées à 100% !');
     }
 
     function addExtraSetToDraft(exIdx) {
-      const ex = currentSessionDraft[exIdx];
-      ex.achievedSets.push(ex.targetReps);
-      saveState();
+      currentSessionDraft[exIdx].achievedSets.push(currentSessionDraft[exIdx].targetReps);
+      saveStateImmediate();
       renderSessionLoggingView();
     }
 
     function removeLastSetFromDraft(exIdx) {
-      const ex = currentSessionDraft[exIdx];
-      if (ex.achievedSets.length > 1) {
-        ex.achievedSets.pop();
-        saveState();
+      if (currentSessionDraft[exIdx].achievedSets.length > 1) {
+        currentSessionDraft[exIdx].achievedSets.pop();
+        saveStateImmediate();
         renderSessionLoggingView();
       }
     }
 
     function updateLiveSessionSummary() {
-      let totalTarget = 0;
-      let totalAchieved = 0;
+      let totT = 0, totA = 0;
       currentSessionDraft.forEach(ex => {
-        totalTarget += ex.targetSets * ex.targetReps;
-        totalAchieved += ex.achievedSets.reduce((s, v) => s + (Number(v) || 0), 0);
+        totT += ex.targetSets * ex.targetReps;
+        totA += ex.achievedSets.reduce((s, v) => s + (Number(v) || 0), 0);
       });
-      const pct = totalTarget > 0 ? Math.round((totalAchieved / totalTarget) * 100) : 0;
-      document.getElementById('liveSessionScoreText').textContent = `${totalAchieved} / ${totalTarget} reps — ${pct}%`;
+      const pct = totT > 0 ? Math.round((totA / totT) * 100) : 0;
+      document.getElementById('liveSessionScoreText').textContent = `${totA} / ${totT} reps (${pct}%)`;
       document.getElementById('liveSessionProgressBar').style.width = `${Math.min(100, pct)}%`;
     }
 
     function saveCompletedSession() {
-      if (currentSessionDraft.length === 0) {
-        showToast('Ajoutez au moins un exercice dans votre routine.');
-        return;
-      }
-
+      if (currentSessionDraft.length === 0) return;
       const routine = getActiveRoutine();
       const dateVal = document.getElementById('sessionDateInput').value || new Date().toISOString().slice(0, 10);
       const noteVal = document.getElementById('sessionNoteInput').value.trim();
-      const autoOverloadOn = appState.autoOverloadEnabled !== false;
-      const overloadMode = appState.overloadMode || 'reps';
-
-      const upgradedExercises = [];
-
-      const recordedExercises = currentSessionDraft.map(ex => ({
-        name: ex.name,
-        targetSets: ex.targetSets,
-        targetReps: ex.targetReps,
-        targetWeight: ex.targetWeight,
-        achievedSets: [...ex.achievedSets],
-        actualWeight: ex.actualWeight
-      }));
-
-      // Surcharge progressive automatique sur la routine si 100% validé
-      if (autoOverloadOn && routine) {
-        currentSessionDraft.forEach((draftEx, idx) => {
-          if (isExerciseEligibleForLevelUp(draftEx) && routine.exercises[idx]) {
-            const routineEx = routine.exercises[idx];
-            if (overloadMode === 'weight') {
-              const oldW = Number(routineEx.targetWeight) || 0;
-              routineEx.targetWeight = oldW + 2.5;
-              upgradedExercises.push({
-                name: routineEx.name,
-                detail: `Lest : +${oldW} kg → +${routineEx.targetWeight} kg`
-              });
-            } else {
-              const oldR = Number(routineEx.targetReps) || 10;
-              routineEx.targetReps = oldR + 1;
-              upgradedExercises.push({
-                name: routineEx.name,
-                detail: `${routineEx.targetSets}×${oldR} → ${routineEx.targetSets}×${routineEx.targetReps} reps`
-              });
-            }
-          }
-        });
-      }
 
       const newSession = {
         id: 'sess_' + Date.now(),
         type: 'routine',
         date: dateVal,
         routineId: routine ? routine.id : 'custom',
-        routineName: routine ? routine.name : 'Séance Routine',
+        routineName: routine ? routine.name : 'Séance',
         note: noteVal,
-        levelUps: upgradedExercises.map(u => `${u.name} (${u.detail})`),
-        exercises: recordedExercises
+        exercises: currentSessionDraft.map(ex => ({
+          name: ex.name,
+          targetSets: ex.targetSets,
+          targetReps: ex.targetReps,
+          targetWeight: ex.targetWeight,
+          achievedSets: [...ex.achievedSets],
+          actualWeight: ex.actualWeight
+        }))
       };
+
+      // Auto Level-Up check
+      let leveledUpCount = 0;
+      if (appState.autoLevelUp && routine) {
+        currentSessionDraft.forEach((draftEx, idx) => {
+          const allPassed = draftEx.achievedSets.every(r => Number(r) >= draftEx.targetReps);
+          if (allPassed && routine.exercises[idx]) {
+            routine.exercises[idx].targetReps += 1;
+            leveledUpCount++;
+          }
+        });
+      }
 
       appState.sessions.push(newSession);
       appState.sessions.sort((a, b) => a.date.localeCompare(b.date));
-
       document.getElementById('sessionNoteInput').value = '';
-      initOrSyncSessionDraft(true);
-      saveState();
+
+      initSessionDraftFromRoutine(true);
+      saveStateImmediate();
       refreshAllDashboardViews();
 
-      if (upgradedExercises.length > 0) {
-        const banner = document.getElementById('levelUpBanner');
-        const list = document.getElementById('levelUpList');
-        list.innerHTML = upgradedExercises.map(u => `
-          <span class="px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-xs font-bold text-emerald-300 mono">
-            ⚡ ${u.name} : ${u.detail}
-          </span>
-        `).join('');
-        banner.classList.remove('hidden');
-        lucide.createIcons();
-        showToast(`Séance enregistrée + ${upgradedExercises.length} exercice(s) en Level-Up !`);
+      if (leveledUpCount > 0) {
+        showToast(`Séance enregistrée ! 🔥 +1 rep sur ${leveledUpCount} exercice(s) pour la prochaine séance !`);
       } else {
-        showToast('Séance enregistrée et sauvegardée avec succès !');
+        showToast('Séance enregistrée avec succès !');
       }
     }
 
-    // RENDU ONGLET 2 : ÉDITER MA ROUTINE (OBJECTIFS) AVEC SAUVEGARDE IMMÉDIATE
+    // TAB 2: ROUTINE BUILDER
     function renderRoutineBuilderView() {
       const routine = getActiveRoutine();
       const list = document.getElementById('builderExercisesList');
-      if (!list) return;
       list.innerHTML = '';
 
       if (!routine || routine.exercises.length === 0) {
-        list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Cette routine est vide. Utilisez le formulaire ci-dessus pour ajouter vos exercices.</p>`;
+        list.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Cette routine est vide. Ajoute un exercice ci-dessus.</p>`;
         return;
       }
 
@@ -1483,61 +1052,24 @@
         const row = document.createElement('div');
         row.className = 'bg-slate-900/60 border border-borderDark rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3';
         row.innerHTML = `
-          <div class="flex items-center gap-2 flex-1 min-w-[230px]">
-            <div class="flex flex-col gap-0.5">
-              <button onclick="moveExerciseInRoutine(${idx}, -1)" class="text-slate-500 hover:text-white text-[10px] leading-none px-1" title="Monter">▲</button>
-              <button onclick="moveExerciseInRoutine(${idx}, 1)" class="text-slate-500 hover:text-white text-[10px] leading-none px-1" title="Descendre">▼</button>
-            </div>
-            <span class="w-6 h-6 rounded-lg bg-orange-500/15 text-orange-400 text-xs font-bold flex items-center justify-center mono shrink-0">${idx + 1}</span>
-            <select
-              onchange="handleBuilderExerciseSelectChange(${idx}, this)"
-              class="flex-1 bg-bgMain border border-borderDark rounded-lg px-2.5 py-1.5 text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-orange-500"
-            >
-              ${buildExerciseSelectOptionsHtml(ex.name)}
-            </select>
+          <div class="flex items-center gap-2 flex-1 min-w-[210px]">
+            <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center mono">${idx + 1}</span>
+            ${buildExerciseSelectHtml(ex.name, idx)}
           </div>
-
           <div class="flex flex-wrap items-center gap-3">
             <div class="flex items-center gap-1.5">
               <label class="text-[11px] text-slate-400">Séries :</label>
-              <input
-                type="number"
-                min="1"
-                max="30"
-                value="${ex.targetSets}"
-                oninput="updateRoutineExerciseFieldLive(${idx}, 'targetSets', this.value)"
-                onchange="updateRoutineExerciseFieldCommit(${idx}, 'targetSets', this.value)"
-                class="w-14 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs font-bold text-white mono text-center focus:outline-none focus:border-orange-500"
-              />
+              <input type="number" min="1" max="20" value="${ex.targetSets}" oninput="updateRoutineExerciseField(${idx}, 'targetSets', this.value)" class="w-14 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs font-bold text-white mono text-center" />
             </div>
-
             <div class="flex items-center gap-1.5">
-              <label class="text-[11px] text-slate-400">Reps / série :</label>
-              <input
-                type="number"
-                min="1"
-                max="500"
-                value="${ex.targetReps}"
-                oninput="updateRoutineExerciseFieldLive(${idx}, 'targetReps', this.value)"
-                onchange="updateRoutineExerciseFieldCommit(${idx}, 'targetReps', this.value)"
-                class="w-16 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs font-bold text-orange-400 mono text-center focus:outline-none focus:border-orange-500"
-              />
+              <label class="text-[11px] text-slate-400">Reps :</label>
+              <input type="number" min="1" max="300" value="${ex.targetReps}" oninput="updateRoutineExerciseField(${idx}, 'targetReps', this.value)" class="w-16 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs font-bold text-orange-400 mono text-center" />
             </div>
-
             <div class="flex items-center gap-1.5">
               <label class="text-[11px] text-slate-400">Lest (kg) :</label>
-              <input
-                type="number"
-                min="0"
-                step="0.5"
-                value="${ex.targetWeight || 0}"
-                oninput="updateRoutineExerciseFieldLive(${idx}, 'targetWeight', this.value)"
-                onchange="updateRoutineExerciseFieldCommit(${idx}, 'targetWeight', this.value)"
-                class="w-16 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs font-bold text-sky-400 mono text-center focus:outline-none focus:border-orange-500"
-              />
+              <input type="number" min="0" step="0.5" value="${ex.targetWeight || 0}" oninput="updateRoutineExerciseField(${idx}, 'targetWeight', this.value)" class="w-16 bg-bgMain border border-borderDark rounded-lg px-2 py-1 text-xs font-bold text-sky-400 mono text-center" />
             </div>
-
-            <button onclick="removeExerciseFromRoutine(${idx})" class="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition" title="Supprimer l'exercice">
+            <button onclick="removeExerciseFromRoutine(${idx})" class="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition">
               <i data-lucide="Trash" class="w-4 h-4"></i>
             </button>
           </div>
@@ -1547,216 +1079,163 @@
       lucide.createIcons();
     }
 
-    function handleBuilderExerciseSelectChange(exIdx, selectEl) {
-      if (selectEl.value === '__CUSTOM__') {
-        renderRoutineBuilderView();
-        showToast('Utilisez "+ Exercice personnalisé..." dans le bloc d’ajout ci-dessus pour saisir un nom libre.');
-        return;
-      }
+    function handleBuilderRowExerciseChange(exIdx, val) {
       const routine = getActiveRoutine();
       if (!routine || !routine.exercises[exIdx]) return;
-      routine.exercises[exIdx].name = selectEl.value;
-      initOrSyncSessionDraft(false);
-      saveState();
-      renderSessionLoggingView();
-      populateChartExerciseDropdown();
-      showToast(`Exercice modifié : ${selectEl.value}`);
-    }
-
-    // Sauvegarde instantanée dès la frappe (oninput) pour que même si l'utilisateur ferme l'onglet sans cliquer ailleurs, tout soit enregistré
-    function updateRoutineExerciseFieldLive(exIdx, field, value) {
-      const routine = getActiveRoutine();
-      if (!routine || !routine.exercises[exIdx]) return;
-
-      if (field === 'targetSets') {
-        routine.exercises[exIdx].targetSets = Math.max(1, parseInt(value, 10) || 1);
-      } else if (field === 'targetReps') {
-        routine.exercises[exIdx].targetReps = Math.max(1, parseInt(value, 10) || 1);
-      } else if (field === 'targetWeight') {
-        routine.exercises[exIdx].targetWeight = Math.max(0, parseFloat(value) || 0);
+      if (val === '__CUSTOM__') {
+        const custom = prompt("Nom de l'exercice personnalisé :");
+        if (custom && custom.trim()) {
+          routine.exercises[exIdx].name = custom.trim();
+        }
+      } else {
+        routine.exercises[exIdx].name = val;
       }
-
-      initOrSyncSessionDraft(true);
-      saveState(false);
-    }
-
-    function updateRoutineExerciseFieldCommit(exIdx, field, value) {
-      updateRoutineExerciseFieldLive(exIdx, field, value);
-      renderSessionLoggingView();
-      showToast('Objectif de routine sauvegardé.');
-    }
-
-    function moveExerciseInRoutine(exIdx, direction) {
-      const routine = getActiveRoutine();
-      if (!routine) return;
-      const targetIdx = exIdx + direction;
-      if (targetIdx < 0 || targetIdx >= routine.exercises.length) return;
-      const temp = routine.exercises[exIdx];
-      routine.exercises[exIdx] = routine.exercises[targetIdx];
-      routine.exercises[targetIdx] = temp;
-      initOrSyncSessionDraft(true);
-      saveState();
+      initSessionDraftFromRoutine(true);
+      saveStateImmediate();
       renderRoutineBuilderView();
-      renderSessionLoggingView();
+      populateChartExerciseDropdown();
     }
 
     function addExerciseToRoutine() {
       const routine = getActiveRoutine();
       if (!routine) return;
-      const selectEl = document.getElementById('newExSelect');
-      const customInput = document.getElementById('newExCustomInput');
-      const setsInput = document.getElementById('newExSets');
-      const repsInput = document.getElementById('newExReps');
-      const weightInput = document.getElementById('newExWeight');
+      const sel = document.getElementById('builderExerciseSelect');
+      const customInp = document.getElementById('builderCustomExName');
+      const name = sel.value === '__CUSTOM__' ? customInp.value.trim() : sel.value;
 
-      let name = selectEl.value;
-      if (name === '__CUSTOM__') {
-        name = customInput.value.trim();
-        if (!name) {
-          showToast('Veuillez saisir le nom de votre exercice personnalisé.');
-          return;
-        }
+      if (!name) {
+        showToast("Choisis ou écris le nom d'un exercice.");
+        return;
       }
 
       routine.exercises.push({
         id: 'ex_' + Date.now(),
         name,
-        targetSets: Math.max(1, parseInt(setsInput.value, 10) || 4),
-        targetReps: Math.max(1, parseInt(repsInput.value, 10) || 10),
-        targetWeight: Math.max(0, parseFloat(weightInput.value) || 0)
+        targetSets: Math.max(1, parseInt(document.getElementById('newExSets').value, 10) || 4),
+        targetReps: Math.max(1, parseInt(document.getElementById('newExReps').value, 10) || 10),
+        targetWeight: Math.max(0, parseFloat(document.getElementById('newExWeight').value) || 0)
       });
 
-      customInput.value = '';
-      document.getElementById('newExCustomWrapper').classList.add('hidden');
-      selectEl.value = 'Tractions Pronation';
+      customInp.value = '';
+      initSessionDraftFromRoutine(true);
+      saveStateImmediate();
+      renderRoutineSelect();
+      renderRoutineBuilderView();
+      populateChartExerciseDropdown();
+      showToast(`"${name}" ajouté et sauvegardé !`);
+    }
 
-      initOrSyncSessionDraft(true);
-      saveState();
-      refreshAllDashboardViews();
-      showToast(`"${name}" ajouté et sauvegardé dans votre routine !`);
+    function updateRoutineExerciseField(exIdx, field, value) {
+      const routine = getActiveRoutine();
+      if (!routine || !routine.exercises[exIdx]) return;
+      if (field === 'targetSets') routine.exercises[exIdx].targetSets = Math.max(1, parseInt(value, 10) || 1);
+      if (field === 'targetReps') routine.exercises[exIdx].targetReps = Math.max(1, parseInt(value, 10) || 1);
+      if (field === 'targetWeight') routine.exercises[exIdx].targetWeight = Math.max(0, parseFloat(value) || 0);
+      initSessionDraftFromRoutine(true);
+      saveStateImmediate();
     }
 
     function removeExerciseFromRoutine(exIdx) {
       const routine = getActiveRoutine();
       if (!routine) return;
-      const removedName = routine.exercises[exIdx]?.name || 'Exercice';
       routine.exercises.splice(exIdx, 1);
-      initOrSyncSessionDraft(true);
-      saveState();
-      refreshAllDashboardViews();
-      showToast(`"${removedName}" retiré de la routine.`);
+      initSessionDraftFromRoutine(true);
+      saveStateImmediate();
+      renderRoutineSelect();
+      renderRoutineBuilderView();
+      populateChartExerciseDropdown();
     }
 
-    // ONGLET 3 : ENTRER UN MAX / HORS ROUTINE
-    function handleMaxTypeChange() {
-      const type = document.getElementById('maxTypeSelect').value;
-      const label = document.getElementById('maxValueLabel');
-      if (type === 'hold') {
-        label.textContent = 'Maintien Max réalisé (Secondes)';
-      } else if (type === 'weighted') {
-        label.textContent = 'Répétitions réalisées avec lest';
-      } else {
-        label.textContent = 'Score Max réalisé (Reps sur 1 série)';
+    function createNewRoutinePrompt() {
+      const name = prompt('Nom de ta nouvelle routine :');
+      if (!name || !name.trim()) return;
+      const newR = {
+        id: 'routine_' + Date.now(),
+        name: name.trim(),
+        exercises: [
+          { id: 'ex_' + Date.now(), name: 'Tractions Pronation (Pull-Ups)', targetSets: 4, targetReps: 10, targetWeight: 0 }
+        ]
+      };
+      appState.routines.push(newR);
+      appState.activeRoutineId = newR.id;
+      initSessionDraftFromRoutine(true);
+      saveStateImmediate();
+      renderRoutineSelect();
+      renderSessionLoggingView();
+      renderRoutineBuilderView();
+      showToast(`Routine "${newR.name}" créée !`);
+    }
+
+    function deleteCurrentRoutine() {
+      if (appState.routines.length <= 1) {
+        showToast('Conserve au moins une routine.');
+        return;
       }
+      const r = getActiveRoutine();
+      if (!confirm(`Supprimer la routine "${r.name}" ?`)) return;
+      appState.routines = appState.routines.filter(item => item.id !== r.id);
+      appState.activeRoutineId = appState.routines[0].id;
+      initSessionDraftFromRoutine(true);
+      saveStateImmediate();
+      renderRoutineSelect();
+      renderSessionLoggingView();
+      renderRoutineBuilderView();
     }
 
-    function saveStandaloneMax() {
-      const selectEl = document.getElementById('maxExSelect');
-      const customInput = document.getElementById('maxExCustomInput');
-      const maxType = document.getElementById('maxTypeSelect').value;
-      const scoreVal = Math.max(1, parseInt(document.getElementById('maxScoreInput').value, 10) || 1);
-      const weightVal = Math.max(0, parseFloat(document.getElementById('maxWeightInput').value) || 0);
+    // TAB 3: SAVE MAX RECORD OUTSIDE ROUTINE
+    function saveMaxRecord() {
+      const sel = document.getElementById('maxExerciseSelect');
+      const customInp = document.getElementById('maxCustomExName');
+      const exName = sel.value === '__CUSTOM__' ? customInp.value.trim() : sel.value;
+      if (!exName) {
+        showToast("Sélectionne un exercice.");
+        return;
+      }
+      const val = Math.max(1, parseInt(document.getElementById('maxValueInput').value, 10) || 1);
+      const unit = document.getElementById('maxUnitSelect').value;
+      const weight = Math.max(0, parseFloat(document.getElementById('maxWeightInput').value) || 0);
       const dateVal = document.getElementById('maxDateInput').value || new Date().toISOString().slice(0, 10);
       const noteVal = document.getElementById('maxNoteInput').value.trim();
 
-      let exName = selectEl.value;
-      if (exName === '__CUSTOM__') {
-        exName = customInput.value.trim();
-        if (!exName) {
-          showToast("Veuillez saisir le nom de l'exercice ou de la figure.");
-          return;
-        }
-      }
-
-      const unit = maxType === 'hold' ? 'sec' : 'reps';
-
-      const newMaxEntry = {
+      appState.sessions.push({
         id: 'max_' + Date.now(),
         type: 'max_test',
-        maxType,
-        unit,
         date: dateVal,
-        routineId: 'hors_routine',
-        routineName: 'MAX HORS ROUTINE',
-        note: noteVal || `Max Hors Routine : ${scoreVal} ${unit}${weightVal > 0 ? ' (+' + weightVal + ' kg)' : ''}`,
-        levelUps: [],
+        routineId: 'max_hors_routine',
+        routineName: `Test de Max (${unit})`,
+        note: noteVal,
         exercises: [
           {
             name: exName,
+            unit,
             targetSets: 1,
-            targetReps: scoreVal,
-            targetWeight: weightVal,
-            achievedSets: [scoreVal],
-            actualWeight: weightVal
+            targetReps: val,
+            targetWeight: weight,
+            achievedSets: [val],
+            actualWeight: weight
           }
         ]
-      };
+      });
 
-      appState.sessions.push(newMaxEntry);
       appState.sessions.sort((a, b) => a.date.localeCompare(b.date));
-
-      // Met aussi à jour la carte Figure correspondante si le score est supérieur
-      if (Array.isArray(appState.skillGoals)) {
-        appState.skillGoals.forEach(sk => {
-          if (exName.toLowerCase().includes(sk.name.toLowerCase()) || sk.name.toLowerCase().includes(exName.toLowerCase())) {
-            if (scoreVal > sk.current) {
-              sk.current = scoreVal;
-            }
-          }
-        });
-      }
-
       document.getElementById('maxNoteInput').value = '';
-      saveState();
-
-      populateChartExerciseDropdown();
-      const chartExSelect = document.getElementById('chartExerciseFilter');
-      const chartMetricSelect = document.getElementById('chartMetricFilter');
-      if (chartExSelect && [...chartExSelect.options].some(o => o.value === exName)) {
-        chartExSelect.value = exName;
-      }
-      if (chartMetricSelect) {
-        chartMetricSelect.value = 'maxReps';
-      }
-
+      saveStateImmediate();
       refreshAllDashboardViews();
-      showToast(`Nouveau Max Hors Routine sauvegardé : ${exName} (${scoreVal} ${unit}) !`);
+      showToast(`Nouveau Max enregistré sur ${exName} : ${val} ${unit} !`);
     }
 
-    // 4. SECTION OBJECTIFS DE FIGURES & SKILLS
-    function toggleAddSkillForm() {
-      const box = document.getElementById('addSkillFormBox');
-      if (box) box.classList.toggle('hidden');
+    // SKILLS & FIGURES TRACKER
+    function toggleNewSkillForm() {
+      document.getElementById('newSkillForm').classList.toggle('hidden');
     }
 
     function addNewSkillGoal() {
-      const selectEl = document.getElementById('newSkillNameSelect');
-      const customEl = document.getElementById('newSkillCustomInput');
-      const variant = document.getElementById('newSkillVariantSelect').value;
-      const unit = document.getElementById('newSkillUnitSelect').value;
-      const target = Math.max(1, parseInt(document.getElementById('newSkillTargetInput').value, 10) || 15);
+      const name = document.getElementById('skillNameSelect').value;
+      const variant = document.getElementById('skillVariantSelect').value;
+      const target = Math.max(1, parseInt(document.getElementById('skillTargetInput').value, 10) || 10);
+      const unit = document.getElementById('skillUnitSelect').value;
 
-      let name = selectEl.value;
-      if (name === '__CUSTOM__') {
-        name = customEl.value.trim();
-        if (!name) {
-          showToast('Veuillez saisir le nom de votre figure.');
-          return;
-        }
-      }
-
-      if (!Array.isArray(appState.skillGoals)) appState.skillGoals = [];
-      appState.skillGoals.push({
+      appState.skills.push({
         id: 'sk_' + Date.now(),
         name,
         variant,
@@ -1764,91 +1243,60 @@
         target,
         unit
       });
-
-      customEl.value = '';
-      document.getElementById('addSkillFormBox').classList.add('hidden');
-      saveState();
-      refreshAllDashboardViews();
-      showToast(`Figure "${name} (${variant})" ajoutée et sauvegardée !`);
+      document.getElementById('newSkillForm').classList.add('hidden');
+      saveStateImmediate();
+      renderSkillsSection();
+      renderKPIsAndPRs();
+      showToast(`Objectif Figure "${name}" ajouté !`);
     }
 
     function renderSkillsSection() {
       const container = document.getElementById('skillsGridContainer');
-      if (!container) return;
       container.innerHTML = '';
 
-      const skills = appState.skillGoals || [];
-      if (skills.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-400 col-span-2 text-center py-4">Aucune figure suivie. Cliquez sur "+ Ajouter une Figure" pour définir un objectif.</p>`;
-        return;
-      }
+      const variants = ['Tuck', 'Advanced Tuck', 'One Leg', 'Straddle', 'Half Lay', 'Full / Strict', 'Élastique'];
 
-      skills.forEach((sk, idx) => {
+      appState.skills.forEach((sk, idx) => {
         const pct = sk.target > 0 ? Math.min(100, Math.round((sk.current / sk.target) * 100)) : 0;
-        const isMastered = sk.current >= sk.target;
+        const done = sk.current >= sk.target;
 
-        const variantOptionsHtml = SKILL_VARIANTS.map(v =>
-          `<option value="${v}" ${v === sk.variant ? 'selected' : ''}>${v}</option>`
-        ).join('');
+        const varOptions = variants.map(v => `<option value="${v}" ${sk.variant === v ? 'selected' : ''}>${v}</option>`).join('');
 
         const card = document.createElement('div');
-        card.className = `bg-bgMain border ${isMastered ? 'border-emerald-500/50' : 'border-borderDark'} rounded-2xl p-4 space-y-3 flex flex-col justify-between`;
+        card.className = `bg-bgMain border ${done ? 'border-emerald-500/40' : 'border-borderDark'} rounded-xl p-3.5 space-y-2.5`;
         card.innerHTML = `
-          <div class="space-y-2.5">
-            <div class="flex items-start justify-between gap-2">
-              <div>
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <h3 class="text-sm font-extrabold text-white">${sk.name}</h3>
-                  ${isMastered ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Objectif Validé !</span>` : ''}
-                </div>
-                <div class="flex items-center gap-1.5 mt-1.5">
-                  <span class="text-[11px] text-slate-400">Variante :</span>
-                  <select
-                    onchange="updateSkillVariant(${idx}, this.value)"
-                    class="bg-bgCard border border-purple-500/30 rounded-lg px-2 py-0.5 text-[11px] font-bold text-purple-300 focus:outline-none"
-                  >
-                    ${variantOptionsHtml}
-                  </select>
-                </div>
-              </div>
-
-              <button onclick="deleteSkillGoal(${idx})" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Supprimer cette figure">
-                <i data-lucide="X" class="w-4 h-4"></i>
-              </button>
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                <span>${sk.name}</span>
+                ${done ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Validé</span>` : ''}
+              </h4>
+              <select onchange="updateSkillVariant(${idx}, this.value)" class="mt-1 bg-bgCard border border-borderDark rounded px-2 py-0.5 text-[11px] text-purple-300 font-semibold">
+                ${varOptions}
+              </select>
             </div>
+            <button onclick="deleteSkill(${idx})" class="text-slate-500 hover:text-rose-400">
+              <i data-lucide="X" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
 
-            <div class="flex items-center justify-between pt-1 text-xs">
+          <div class="space-y-1">
+            <div class="flex justify-between text-[11px]">
               <span class="text-slate-400">Actuel : <strong class="text-white mono">${sk.current} ${sk.unit}</strong></span>
-              <div class="flex items-center gap-1">
-                <span class="text-slate-400">Cible :</span>
-                <input
-                  type="number"
-                  min="1"
-                  max="600"
-                  value="${sk.target}"
-                  oninput="updateSkillTarget(${idx}, this.value)"
-                  class="w-14 bg-bgCard border border-borderDark rounded px-1.5 py-0.5 text-xs font-bold text-emerald-400 mono text-center focus:outline-none"
-                />
-                <span class="text-slate-400 mono">${sk.unit} (${pct}%)</span>
-              </div>
+              <span class="text-slate-400">Obj : <strong class="text-purple-400 mono">${sk.target} ${sk.unit}</strong></span>
             </div>
-
             <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-              <div class="h-full ${isMastered ? 'bg-emerald-400' : 'bg-gradient-to-r from-purple-500 to-orange-500'} transition-all duration-300" style="width: ${pct}%"></div>
+              <div class="h-full ${done ? 'bg-emerald-400' : 'bg-purple-500'} transition-all" style="width: ${pct}%"></div>
             </div>
           </div>
 
-          <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center justify-between pt-1">
             <div class="flex items-center gap-1">
-              <button onclick="adjustSkillScore(${idx}, -1)" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 mono">-1</button>
-              <button onclick="adjustSkillScore(${idx}, 1)" class="px-2 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-xs font-bold text-purple-300 mono">+1</button>
-              <button onclick="adjustSkillScore(${idx}, 2)" class="px-2 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-xs font-bold text-purple-300 mono">+2</button>
-              <button onclick="adjustSkillScore(${idx}, 5)" class="px-2 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 text-xs font-bold text-purple-300 mono">+5</button>
+              <button onclick="adjustSkillProgress(${idx}, -1)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 mono">-1</button>
+              <button onclick="adjustSkillProgress(${idx}, 1)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-xs text-white mono">+1</button>
+              <button onclick="adjustSkillProgress(${idx}, 5)" class="px-2 py-0.5 rounded bg-purple-500/20 hover:bg-purple-500/30 text-xs text-purple-300 mono">+5</button>
             </div>
-
-            <button onclick="logSkillRecordToHistory(${idx})" class="px-2.5 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-[11px] font-bold text-white transition" title="Enregistrer ce score dans l'historique et le graphique">
-              Valider PR
-            </button>
+            <button onclick="adjustSkillProgress(${idx}, ${sk.target - sk.current})" class="text-[11px] font-semibold text-emerald-400 hover:underline">Valider Obj</button>
           </div>
         `;
         container.appendChild(card);
@@ -1856,353 +1304,171 @@
       lucide.createIcons();
     }
 
-    function updateSkillVariant(idx, newVariant) {
-      if (!appState.skillGoals || !appState.skillGoals[idx]) return;
-      appState.skillGoals[idx].variant = newVariant;
-      saveState();
-      renderSkillsSection();
-      showToast(`Variante sauvegardée : ${newVariant}`);
-    }
-
-    function updateSkillTarget(idx, newTarget) {
-      if (!appState.skillGoals || !appState.skillGoals[idx]) return;
-      appState.skillGoals[idx].target = Math.max(1, parseInt(newTarget, 10) || 1);
-      saveState(true);
-    }
-
-    function adjustSkillScore(idx, delta) {
-      if (!appState.skillGoals || !appState.skillGoals[idx]) return;
-      appState.skillGoals[idx].current = Math.max(0, (Number(appState.skillGoals[idx].current) || 0) + delta);
-      saveState();
+    function updateSkillVariant(idx, val) {
+      appState.skills[idx].variant = val;
+      saveStateImmediate();
       renderSkillsSection();
     }
 
-    function logSkillRecordToHistory(idx) {
-      if (!appState.skillGoals || !appState.skillGoals[idx]) return;
-      const sk = appState.skillGoals[idx];
-      const val = Number(sk.current) || 0;
-
-      appState.sessions.push({
-        id: 'skill_max_' + Date.now(),
-        type: 'max_test',
-        maxType: sk.unit === 'sec' ? 'hold' : 'reps',
-        unit: sk.unit,
-        date: new Date().toISOString().slice(0, 10),
-        routineId: 'skill_goal',
-        routineName: `MAX HORS ROUTINE (${sk.variant})`,
-        note: `Validation Figure ${sk.name} [${sk.variant}] : ${val}/${sk.target} ${sk.unit}`,
-        levelUps: [],
-        exercises: [
-          {
-            name: sk.name,
-            targetSets: 1,
-            targetReps: sk.target,
-            targetWeight: 0,
-            achievedSets: [val],
-            actualWeight: 0
-          }
-        ]
-      });
-
-      appState.sessions.sort((a, b) => a.date.localeCompare(b.date));
-      saveState();
-      refreshAllDashboardViews();
-      showToast(`Performance "${sk.name} (${sk.variant})" ajoutée au graphique et aux PR !`);
-    }
-
-    function deleteSkillGoal(idx) {
-      if (!appState.skillGoals) return;
-      appState.skillGoals.splice(idx, 1);
-      saveState();
+    function adjustSkillProgress(idx, delta) {
+      const sk = appState.skills[idx];
+      sk.current = Math.max(0, sk.current + delta);
+      saveStateImmediate();
       renderSkillsSection();
+      renderKPIsAndPRs();
     }
 
-    // MODALES CRÉATION / RENOMMAGE / SUPPRESSION DE ROUTINE
-    function openNewRoutineModal() {
-      routineModalMode = 'create';
-      document.getElementById('routineNameModalTitle').textContent = 'Créer une nouvelle routine';
-      document.getElementById('routineNameModalInput').value = '';
-      document.getElementById('routineNameModal').classList.remove('hidden');
-      document.getElementById('routineNameModal').classList.add('flex');
+    function deleteSkill(idx) {
+      appState.skills.splice(idx, 1);
+      saveStateImmediate();
+      renderSkillsSection();
+      renderKPIsAndPRs();
     }
 
-    function openRenameRoutineModal() {
-      const r = getActiveRoutine();
-      if (!r) return;
-      routineModalMode = 'rename';
-      document.getElementById('routineNameModalTitle').textContent = 'Renommer la routine active';
-      document.getElementById('routineNameModalInput').value = r.name;
-      document.getElementById('routineNameModal').classList.remove('hidden');
-      document.getElementById('routineNameModal').classList.add('flex');
-    }
-
-    function closeRoutineNameModal() {
-      document.getElementById('routineNameModal').classList.add('hidden');
-      document.getElementById('routineNameModal').classList.remove('flex');
-    }
-
-    function confirmRoutineNameModal() {
-      const name = document.getElementById('routineNameModalInput').value.trim();
-      if (!name) {
-        showToast('Veuillez saisir un nom de routine.');
-        return;
-      }
-
-      if (routineModalMode === 'rename') {
-        const r = getActiveRoutine();
-        if (r) r.name = name;
-        closeRoutineNameModal();
-        saveState();
-        refreshAllDashboardViews();
-        showToast(`Routine renommée en "${name}" !`);
-      } else {
-        const newRoutine = {
-          id: 'routine_' + Date.now(),
-          name,
-          exercises: [
-            { id: 'ex_' + Date.now() + '_1', name: 'Tractions Pronation', targetSets: 4, targetReps: 10, targetWeight: 0 },
-            { id: 'ex_' + Date.now() + '_2', name: 'Dips Barres Parallèles', targetSets: 4, targetReps: 12, targetWeight: 0 }
-          ]
-        };
-        appState.routines.push(newRoutine);
-        appState.activeRoutineId = newRoutine.id;
-        closeRoutineNameModal();
-        initOrSyncSessionDraft(true);
-        saveState();
-        refreshAllDashboardViews();
-        showToast(`Nouvelle routine "${name}" créée et sauvegardée !`);
-      }
-    }
-
-    function openDeleteRoutineModal() {
-      if (appState.routines.length <= 1) {
-        showToast('Vous devez conserver au moins une routine active.');
-        return;
-      }
-      document.getElementById('deleteRoutineModal').classList.remove('hidden');
-      document.getElementById('deleteRoutineModal').classList.add('flex');
-    }
-
-    function closeDeleteRoutineModal() {
-      document.getElementById('deleteRoutineModal').classList.add('hidden');
-      document.getElementById('deleteRoutineModal').classList.remove('flex');
-    }
-
-    function confirmDeleteRoutine() {
-      const routine = getActiveRoutine();
-      appState.routines = appState.routines.filter(r => r.id !== routine.id);
-      appState.activeRoutineId = appState.routines[0].id;
-      closeDeleteRoutineModal();
-      initOrSyncSessionDraft(true);
-      saveState();
-      refreshAllDashboardViews();
-      showToast('Routine supprimée.');
-    }
-
-    // 5. KPI, RECORDS PERSONNELS (PR) & HISTORIQUE
+    // KPIs, PRs & HISTORY
     function renderKPIsAndPRs() {
       const sessions = appState.sessions;
       document.getElementById('kpiTotalSessions').textContent = sessions.length;
-
       if (sessions.length > 0) {
-        const last = sessions[sessions.length - 1];
-        document.getElementById('kpiLastSessionDate').textContent = `Dernière : ${last.date}`;
-      } else {
-        document.getElementById('kpiLastSessionDate').textContent = 'Aucune entrée';
+        document.getElementById('kpiLastSessionDate').textContent = `Dernière : ${sessions[sessions.length - 1].date}`;
       }
 
-      let grandTargetReps = 0;
-      let grandAchievedReps = 0;
+      const validSkills = appState.skills.filter(s => s.current >= s.target).length;
+      document.getElementById('kpiSkillsValidated').textContent = `${validSkills} / ${appState.skills.length}`;
+
+      let grandT = 0, grandA = 0;
       const prMap = {};
 
       sessions.forEach(sess => {
-        const isMaxTest = sess.type === 'max_test';
         sess.exercises.forEach(ex => {
-          const targetVol = (Number(ex.targetSets) || 0) * (Number(ex.targetReps) || 0);
-          const achievedVol = (ex.achievedSets || []).reduce((a, b) => a + (Number(b) || 0), 0);
+          const tVol = (Number(ex.targetSets) || 0) * (Number(ex.targetReps) || 0);
+          const aVol = (ex.achievedSets || []).reduce((a, b) => a + (Number(b) || 0), 0);
           const maxSet = (ex.achievedSets || []).reduce((m, b) => Math.max(m, Number(b) || 0), 0);
           const w = Number(ex.actualWeight) || 0;
 
-          if (!isMaxTest) {
-            grandTargetReps += targetVol;
+          if (sess.type !== 'max_test') {
+            grandT += tVol;
+            grandA += aVol;
           }
-          grandAchievedReps += achievedVol;
 
           if (!prMap[ex.name]) {
-            prMap[ex.name] = {
-              maxSingleSet: maxSet,
-              maxVolume: achievedVol,
-              maxWeight: w,
-              unit: sess.unit || (ex.name.includes('(sec)') ? 'sec' : 'reps'),
-              hasHorsRoutine: isMaxTest
-            };
+            prMap[ex.name] = { maxSingleSet: maxSet, maxVolume: aVol, maxWeight: w, unit: ex.unit || 'reps' };
           } else {
             prMap[ex.name].maxSingleSet = Math.max(prMap[ex.name].maxSingleSet, maxSet);
-            prMap[ex.name].maxVolume = Math.max(prMap[ex.name].maxVolume, achievedVol);
+            prMap[ex.name].maxVolume = Math.max(prMap[ex.name].maxVolume, aVol);
             prMap[ex.name].maxWeight = Math.max(prMap[ex.name].maxWeight, w);
-            if (isMaxTest) prMap[ex.name].hasHorsRoutine = true;
           }
         });
       });
 
-      const avgPct = grandTargetReps > 0 ? Math.round((grandAchievedReps / grandTargetReps) * 100) : 100;
+      const avgPct = grandT > 0 ? Math.round((grandA / grandT) * 100) : 0;
       document.getElementById('kpiAvgCompletion').textContent = `${avgPct}%`;
-      document.getElementById('kpiTotalReps').textContent = grandAchievedReps.toLocaleString('fr-FR');
-      document.getElementById('kpiTargetRepsTotal').textContent = `Sur ${grandTargetReps.toLocaleString('fr-FR')} reps ciblées en routine`;
 
-      const prEntries = Object.entries(prMap);
-      if (prEntries.length > 0) {
-        prEntries.sort((a, b) => b[1].maxSingleSet - a[1].maxSingleSet);
-        const [bestName, bestStats] = prEntries[0];
+      const entries = Object.entries(prMap);
+      if (entries.length > 0) {
+        entries.sort((a, b) => b[1].maxSingleSet - a[1].maxSingleSet);
+        const [bestName, bestStats] = entries[0];
         document.getElementById('kpiBestPR').textContent = bestName;
-        document.getElementById('kpiBestPRSub').textContent = `Max : ${bestStats.maxSingleSet} ${bestStats.unit} (Vol: ${bestStats.maxVolume})`;
-      } else {
-        document.getElementById('kpiBestPR').textContent = '—';
-        document.getElementById('kpiBestPRSub').textContent = 'Record absolu';
+        document.getElementById('kpiBestPRSub').textContent = `Max : ${bestStats.maxSingleSet} ${bestStats.unit} ${bestStats.maxWeight > 0 ? '(+' + bestStats.maxWeight + 'kg)' : ''}`;
       }
 
       const prGrid = document.getElementById('prGridContainer');
       prGrid.innerHTML = '';
-      if (prEntries.length === 0) {
-        prGrid.innerHTML = `<p class="text-xs text-slate-400 col-span-2">Enregistrez une séance ou un Max hors routine pour afficher vos records.</p>`;
-      } else {
-        prEntries.forEach(([exName, stats]) => {
-          const div = document.createElement('div');
-          div.className = 'bg-bgMain border border-borderDark rounded-xl p-3 flex items-center justify-between';
-          div.innerHTML = `
-            <div class="min-w-0 pr-2">
-              <div class="flex items-center gap-1.5">
-                <p class="text-xs font-bold text-white truncate">${exName}</p>
-                ${stats.hasHorsRoutine ? `<span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">MAX</span>` : ''}
-              </div>
-              <p class="text-[11px] text-slate-400 mt-0.5">Vol. max : <span class="text-slate-200 font-semibold mono">${stats.maxVolume}</span></p>
-            </div>
-            <div class="text-right shrink-0">
-              <span class="px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-extrabold mono">
-                ${stats.maxSingleSet} ${stats.unit}
-              </span>
-              ${stats.maxWeight > 0 ? `<p class="text-[10px] text-sky-400 font-semibold mono mt-1">+${stats.maxWeight} kg</p>` : ''}
-            </div>
-          `;
-          prGrid.appendChild(div);
-        });
-      }
+      entries.forEach(([name, stats]) => {
+        const d = document.createElement('div');
+        d.className = 'bg-bgMain border border-borderDark rounded-xl p-3 flex items-center justify-between';
+        d.innerHTML = `
+          <div>
+            <p class="text-xs font-bold text-white truncate max-w-[135px]">${name}</p>
+            <p class="text-[11px] text-slate-400">Vol. max : <span class="text-slate-200 mono">${stats.maxVolume}</span></p>
+          </div>
+          <div class="text-right">
+            <span class="px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-extrabold mono">
+              ${stats.maxSingleSet} ${stats.unit}
+            </span>
+            ${stats.maxWeight > 0 ? `<p class="text-[10px] text-sky-400 font-bold mono mt-0.5">+${stats.maxWeight} kg</p>` : ''}
+          </div>
+        `;
+        prGrid.appendChild(d);
+      });
     }
 
     function renderSessionHistory() {
       const container = document.getElementById('sessionHistoryContainer');
-      const badge = document.getElementById('historyCountBadge');
       const reversed = [...appState.sessions].reverse();
-      badge.textContent = reversed.length;
+      document.getElementById('historyCountBadge').textContent = reversed.length;
       container.innerHTML = '';
 
-      if (reversed.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Aucune séance enregistrée.</p>`;
-        return;
-      }
-
       reversed.forEach(sess => {
-        const isMaxTest = sess.type === 'max_test';
-        let sessTarget = 0;
-        let sessAchieved = 0;
+        const isMax = sess.type === 'max_test';
+        let sT = 0, sA = 0;
         sess.exercises.forEach(ex => {
-          sessTarget += (Number(ex.targetSets) || 0) * (Number(ex.targetReps) || 0);
-          sessAchieved += (ex.achievedSets || []).reduce((a, b) => a + (Number(b) || 0), 0);
+          sT += (Number(ex.targetSets) || 0) * (Number(ex.targetReps) || 0);
+          sA += (ex.achievedSets || []).reduce((a, b) => a + (Number(b) || 0), 0);
         });
-        const pct = sessTarget > 0 ? Math.round((sessAchieved / sessTarget) * 100) : 100;
-        const unitLabel = sess.unit || 'reps';
+        const pct = sT > 0 ? Math.round((sA / sT) * 100) : 100;
 
-        const exDetailsHtml = sess.exercises.map(ex => {
-          const exTarget = ex.targetSets * ex.targetReps;
-          const exDone = ex.achievedSets.reduce((a, b) => a + (Number(b) || 0), 0);
-          const wBadge = ex.actualWeight > 0 ? `<span class="text-sky-400 ml-1">(+${ex.actualWeight}kg)</span>` : '';
-
-          if (isMaxTest) {
-            return `
-              <div class="flex items-center justify-between text-[11px] py-1">
-                <span class="text-purple-200 font-semibold">${ex.name} ${wBadge}</span>
-                <span class="mono font-extrabold text-amber-300">Record : ${exDone} ${unitLabel}</span>
-              </div>
-            `;
-          }
+        const details = sess.exercises.map(ex => {
+          const exT = ex.targetSets * ex.targetReps;
+          const exD = ex.achievedSets.reduce((a, b) => a + (Number(b) || 0), 0);
           return `
             <div class="flex items-center justify-between text-[11px] py-1 border-b border-slate-800/60 last:border-none">
-              <span class="text-slate-300 font-medium">${ex.name} <span class="text-slate-500 mono">(Obj: ${ex.targetSets}×${ex.targetReps})</span>${wBadge}</span>
+              <span class="text-slate-300">${ex.name} ${ex.actualWeight > 0 ? `<strong class="text-sky-400">(+${ex.actualWeight}kg)</strong>` : ''}</span>
               <span class="mono font-semibold text-white">
-                [${ex.achievedSets.join(' - ')}] = <strong class="${exDone >= exTarget ? 'text-emerald-400' : 'text-orange-400'}">${exDone}/${exTarget}</strong>
+                ${isMax ? `<strong class="text-purple-400">MAX : ${exD}${ex.unit || 'reps'}</strong>` : `[${ex.achievedSets.join('-')}] = <strong class="${exD >= exT ? 'text-emerald-400' : 'text-orange-400'}">${exD}/${exT}</strong>`}
               </span>
             </div>
           `;
         }).join('');
 
-        const levelUpsHtml = (sess.levelUps && sess.levelUps.length > 0)
-          ? `<div class="flex flex-wrap gap-1 pt-1">
-               ${sess.levelUps.map(lvl => `<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">⚡ Level-Up: ${lvl}</span>`).join('')}
-             </div>`
-          : '';
-
-        const typeBadgeHtml = isMaxTest
-          ? `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40">MAX HORS ROUTINE</span>`
-          : `<span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/30">ROUTINE</span>`;
-
         const item = document.createElement('div');
-        item.className = `bg-bgMain border ${isMaxTest ? 'border-purple-500/35' : 'border-borderDark'} rounded-xl p-3.5 space-y-2`;
+        item.className = `bg-bgMain border ${isMax ? 'border-purple-500/30' : 'border-borderDark'} rounded-xl p-3.5 space-y-2`;
         item.innerHTML = `
-          <div class="flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              ${typeBadgeHtml}
-              <span class="text-xs font-bold text-white">${sess.routineName}</span>
+              <span class="text-xs font-bold ${isMax ? 'text-purple-400' : 'text-white'}">${sess.routineName}</span>
               <span class="text-[11px] text-slate-400 mono">${sess.date}</span>
             </div>
             <div class="flex items-center gap-2">
-              ${!isMaxTest ? `
-                <span class="text-xs font-extrabold mono px-2 py-0.5 rounded-md ${pct >= 100 ? 'bg-emerald-500/15 text-emerald-400' : 'bg-orange-500/15 text-orange-400'}">
-                  ${sessAchieved}/${sessTarget} (${pct}%)
-                </span>
-              ` : ''}
-              <button onclick="deleteSessionById('${sess.id}')" class="text-slate-500 hover:text-rose-400 transition" title="Supprimer cette entrée">
+              ${isMax
+                ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/15 text-purple-300">Max Hors Routine</span>`
+                : `<span class="text-xs font-extrabold mono px-2 py-0.5 rounded ${pct >= 100 ? 'bg-emerald-500/15 text-emerald-400' : 'bg-orange-500/15 text-orange-400'}">${pct}%</span>`
+              }
+              <button onclick="deleteSessionById('${sess.id}')" class="text-slate-500 hover:text-rose-400">
                 <i data-lucide="Trash2" class="w-3.5 h-3.5"></i>
               </button>
             </div>
           </div>
-          <div class="space-y-0.5 pt-1">${exDetailsHtml}</div>
-          ${levelUpsHtml}
-          ${sess.note ? `<p class="text-[11px] text-slate-400 italic pt-1">"${sess.note}"</p>` : ''}
+          <div>${details}</div>
+          ${sess.note ? `<p class="text-[11px] text-slate-400 italic">"${sess.note}"</p>` : ''}
         `;
         container.appendChild(item);
       });
       lucide.createIcons();
     }
 
-    function deleteSessionById(sessId) {
-      appState.sessions = appState.sessions.filter(s => s.id !== sessId);
-      saveState();
+    function deleteSessionById(id) {
+      appState.sessions = appState.sessions.filter(s => s.id !== id);
+      saveStateImmediate();
       refreshAllDashboardViews();
-      showToast('Entrée supprimée et sauvegardée.');
     }
 
-    // GRAPHIQUE CHART.JS
+    // CHART.JS
     function populateChartExerciseDropdown() {
-      const select = document.getElementById('chartExerciseFilter');
-      if (!select) return;
-      const previousVal = select.value;
-      const namesSet = new Set();
+      const sel = document.getElementById('chartExerciseFilter');
+      const prev = sel.value;
+      const names = new Set();
+      appState.routines.forEach(r => r.exercises.forEach(e => names.add(e.name)));
+      appState.sessions.forEach(s => s.exercises.forEach(e => names.add(e.name)));
 
-      appState.routines.forEach(r => r.exercises.forEach(ex => namesSet.add(ex.name)));
-      appState.sessions.forEach(s => s.exercises.forEach(ex => namesSet.add(ex.name)));
-      (appState.skillGoals || []).forEach(sk => namesSet.add(sk.name));
-
-      select.innerHTML = `<option value="__ALL__">Toute la séance (Total Reps)</option>`;
-      Array.from(namesSet).forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        select.appendChild(opt);
+      sel.innerHTML = `<option value="__ALL__">Toute la séance (Total Reps)</option>`;
+      Array.from(names).forEach(n => {
+        const o = document.createElement('option');
+        o.value = n;
+        o.textContent = n;
+        sel.appendChild(o);
       });
-
-      if ([...select.options].some(o => o.value === previousVal)) {
-        select.value = previousVal;
-      }
+      if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
     }
 
     function updateProgressionChart() {
@@ -2210,97 +1476,59 @@
       const metric = document.getElementById('chartMetricFilter').value;
       const ctx = document.getElementById('progressionChart').getContext('2d');
 
-      const labels = [];
-      const achievedData = [];
-      const targetData = [];
+      const labels = [], achievedData = [], targetData = [];
 
       appState.sessions.forEach(sess => {
         if (exFilter === '__ALL__') {
-          if (sess.type === 'max_test' && metric === 'totalReps') return;
-
-          let totTarget = 0;
-          let totDone = 0;
-          let maxSingle = 0;
-          let maxTargetSingle = 0;
-          let maxW = 0;
-          let maxTargetW = 0;
-
+          if (sess.type === 'max_test' && metric !== 'maxReps') return;
+          let tTot = 0, dTot = 0, maxS = 0, maxT = 0;
           sess.exercises.forEach(ex => {
-            totTarget += (Number(ex.targetSets) || 0) * (Number(ex.targetReps) || 0);
-            totDone += (ex.achievedSets || []).reduce((a, b) => a + (Number(b) || 0), 0);
-            maxSingle = Math.max(maxSingle, ...(ex.achievedSets || [0]));
-            maxTargetSingle = Math.max(maxTargetSingle, Number(ex.targetReps) || 0);
-            maxW = Math.max(maxW, Number(ex.actualWeight) || 0);
-            maxTargetW = Math.max(maxTargetW, Number(ex.targetWeight) || 0);
+            tTot += (Number(ex.targetSets) || 0) * (Number(ex.targetReps) || 0);
+            dTot += (ex.achievedSets || []).reduce((a, b) => a + (Number(b) || 0), 0);
+            maxS = Math.max(maxS, ...(ex.achievedSets || [0]));
+            maxT = Math.max(maxT, Number(ex.targetReps) || 0);
           });
-
-          labels.push(sess.date.slice(5) + (sess.type === 'max_test' ? ' ★' : ''));
-          if (metric === 'totalReps') {
-            achievedData.push(totDone);
-            targetData.push(totTarget);
-          } else if (metric === 'maxReps') {
-            achievedData.push(maxSingle);
-            targetData.push(maxTargetSingle);
-          } else if (metric === 'maxWeight') {
-            achievedData.push(maxW);
-            targetData.push(maxTargetW);
-          } else {
-            achievedData.push(totTarget > 0 ? Math.round((totDone / totTarget) * 100) : 100);
-            targetData.push(100);
-          }
+          labels.push(sess.date.slice(5));
+          if (metric === 'totalReps') { achievedData.push(dTot); targetData.push(tTot); }
+          else if (metric === 'maxReps') { achievedData.push(maxS); targetData.push(maxT); }
+          else { achievedData.push(tTot > 0 ? Math.round((dTot / tTot) * 100) : 100); targetData.push(100); }
         } else {
           const found = sess.exercises.find(e => e.name === exFilter);
           if (found) {
-            const totTarget = (Number(found.targetSets) || 0) * (Number(found.targetReps) || 0);
-            const totDone = (found.achievedSets || []).reduce((a, b) => a + (Number(b) || 0), 0);
-            const maxSingle = Math.max(0, ...(found.achievedSets || [0]));
-
-            labels.push(sess.date.slice(5) + (sess.type === 'max_test' ? ' ★' : ''));
-            if (metric === 'totalReps') {
-              achievedData.push(totDone);
-              targetData.push(totTarget);
-            } else if (metric === 'maxReps') {
-              achievedData.push(maxSingle);
-              targetData.push(Number(found.targetReps) || 0);
-            } else if (metric === 'maxWeight') {
-              achievedData.push(Number(found.actualWeight) || 0);
-              targetData.push(Number(found.targetWeight) || 0);
-            } else {
-              achievedData.push(totTarget > 0 ? Math.round((totDone / totTarget) * 100) : 100);
-              targetData.push(100);
-            }
+            const tTot = (Number(found.targetSets) || 0) * (Number(found.targetReps) || 0);
+            const dTot = (found.achievedSets || []).reduce((a, b) => a + (Number(b) || 0), 0);
+            const maxS = Math.max(0, ...(found.achievedSets || [0]));
+            labels.push(sess.date.slice(5));
+            if (metric === 'totalReps') { achievedData.push(dTot); targetData.push(tTot); }
+            else if (metric === 'maxReps') { achievedData.push(maxS); targetData.push(Number(found.targetReps) || 0); }
+            else { achievedData.push(tTot > 0 ? Math.round((dTot / tTot) * 100) : 100); targetData.push(100); }
           }
         }
       });
 
-      if (chartInstance) {
-        chartInstance.destroy();
-      }
-
+      if (chartInstance) chartInstance.destroy();
       chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels,
           datasets: [
             {
-              label: metric === 'completionRate' ? 'Réussite (%)' : (metric === 'maxWeight' ? 'Lest Réalisé (kg)' : (metric === 'maxReps' ? 'Max 1 Série / Record' : 'Reps Réussies')),
+              label: 'Réalisé (Reps / Max)',
               data: achievedData,
               borderColor: '#f97316',
               backgroundColor: 'rgba(249, 115, 22, 0.18)',
               borderWidth: 3,
-              pointBackgroundColor: '#f97316',
               pointRadius: 4,
               tension: 0.3,
               fill: true
             },
             {
-              label: metric === 'completionRate' ? 'Cible (100%)' : 'Objectif Cible',
+              label: 'Objectif',
               data: targetData,
               borderColor: '#10b981',
-              borderDash: [6, 6],
+              borderDash: [5, 5],
               borderWidth: 2,
               pointRadius: 3,
-              pointBackgroundColor: '#10b981',
               tension: 0.2,
               fill: false
             }
@@ -2309,243 +1537,45 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              labels: { color: '#cbd5e1', font: { size: 11 } }
-            }
-          },
+          plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } },
           scales: {
-            x: {
-              ticks: { color: '#94a3b8', font: { size: 10 } },
-              grid: { color: 'rgba(148, 163, 184, 0.08)' }
-            },
-            y: {
-              beginAtZero: true,
-              ticks: { color: '#94a3b8', font: { size: 11 } },
-              grid: { color: 'rgba(148, 163, 184, 0.08)' }
-            }
+            x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.08)' } },
+            y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.08)' } }
           }
         }
       });
     }
 
-    // CLOUD SYNC EXTERNE (FIREBASE REALTIME DB / REST JSON) & EXPORT/IMPORT JSON
-    function getCloudConfig() {
-      try {
-        const raw = localStorage.getItem(CLOUD_CFG_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch (e) {}
-      return { endpoint: '', userKey: 'mathis_sw_pro', autoSync: true };
-    }
-
-    function saveCloudConfigFromInputs() {
-      const endpoint = (document.getElementById('cloudEndpointInput')?.value || '').trim().replace(/\/+$/, '');
-      const userKey = (document.getElementById('cloudUserKeyInput')?.value || 'mathis_sw_pro').trim().replace(/[^a-zA-Z0-9_-]/g, '');
-      const autoSync = document.getElementById('cloudAutoSyncCheckbox')?.checked !== false;
-      const cfg = { endpoint, userKey, autoSync };
-      localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cfg));
-      return cfg;
-    }
-
-    function buildExternalCloudUrl(cfg) {
-      if (cfg.endpoint.endsWith('.json')) return cfg.endpoint;
-      return `${cfg.endpoint}/calisthenics_pro_v3/${cfg.userKey}.json`;
-    }
-
-    async function pushToExternalCloud(showFeedback = true) {
-      const cfg = showFeedback ? saveCloudConfigFromInputs() : getCloudConfig();
-      const feedback = document.getElementById('cloudFeedbackMsg');
-      if (!cfg.endpoint) {
-        if (showFeedback && feedback) {
-          feedback.textContent = 'Vos données sont déjà sauvegardées localement. Ajoutez une URL Firebase Realtime DB pour synchroniser un second appareil.';
-          feedback.className = 'text-xs font-medium text-center text-amber-400';
-        }
-        return;
-      }
-
-      try {
-        if (showFeedback && feedback) {
-          feedback.textContent = 'Envoi vers le Cloud en cours...';
-          feedback.className = 'text-xs font-medium text-center text-sky-400';
-        }
-        const res = await fetch(buildExternalCloudUrl(cfg), {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            updatedAt: new Date().toISOString(),
-            state: appState
-          })
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        if (showFeedback && feedback) {
-          feedback.textContent = 'Synchronisation Cloud réussie !';
-          feedback.className = 'text-xs font-medium text-center text-emerald-400';
-          showToast('Données synchronisées vers le Cloud !');
-        }
-      } catch (err) {
-        if (showFeedback && feedback) {
-          feedback.textContent = 'Impossible de joindre cette URL Cloud. Votre sauvegarde locale reste active.';
-          feedback.className = 'text-xs font-medium text-center text-rose-400';
-        }
-      }
-    }
-
-    async function pullFromExternalCloud(showFeedback = true) {
-      const cfg = saveCloudConfigFromInputs();
-      const feedback = document.getElementById('cloudFeedbackMsg');
-      if (!cfg.endpoint) {
-        if (showFeedback && feedback) {
-          feedback.textContent = 'Veuillez renseigner une URL Cloud valide.';
-          feedback.className = 'text-xs font-medium text-center text-amber-400';
-        }
-        return;
-      }
-
-      try {
-        if (showFeedback && feedback) {
-          feedback.textContent = 'Chargement depuis le Cloud...';
-          feedback.className = 'text-xs font-medium text-center text-sky-400';
-        }
-        const res = await fetch(buildExternalCloudUrl(cfg));
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        if (data && data.state && Array.isArray(data.state.routines)) {
-          appState = data.state;
-          initOrSyncSessionDraft(false);
-          saveState();
-          refreshAllDashboardViews();
-          if (showFeedback && feedback) {
-            feedback.textContent = 'Données Cloud chargées et sauvegardées sur cet appareil !';
-            feedback.className = 'text-xs font-medium text-center text-emerald-400';
-            showToast('Données Cloud récupérées avec succès !');
-          }
-        } else if (showFeedback && feedback) {
-          feedback.textContent = 'Aucune sauvegarde trouvée pour cette Clé Athlète.';
-          feedback.className = 'text-xs font-medium text-center text-amber-400';
-        }
-      } catch (err) {
-        if (showFeedback && feedback) {
-          feedback.textContent = 'Erreur lors de la récupération Cloud.';
-          feedback.className = 'text-xs font-medium text-center text-rose-400';
-        }
-      }
-    }
-
-    function openCloudModal() {
-      const cfg = getCloudConfig();
-      document.getElementById('cloudEndpointInput').value = cfg.endpoint || '';
-      document.getElementById('cloudUserKeyInput').value = cfg.userKey || 'mathis_sw_pro';
-      document.getElementById('cloudAutoSyncCheckbox').checked = cfg.autoSync !== false;
-      document.getElementById('cloudFeedbackMsg').textContent = '';
-      document.getElementById('cloudModal').classList.remove('hidden');
-      document.getElementById('cloudModal').classList.add('flex');
-    }
-
-    function closeCloudModal() {
-      saveCloudConfigFromInputs();
-      document.getElementById('cloudModal').classList.add('hidden');
-      document.getElementById('cloudModal').classList.remove('flex');
-    }
-
-    function exportDataJson() {
-      saveState(true);
-      const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `calisthenics_pro_backup_${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Fichier de sauvegarde .JSON téléchargé !');
-    }
-
-    function importDataJson(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          if (parsed && Array.isArray(parsed.routines) && Array.isArray(parsed.sessions)) {
-            appState = parsed;
-            if (!Array.isArray(appState.skillGoals)) appState.skillGoals = getDefaultState().skillGoals;
-            initOrSyncSessionDraft(true);
-            saveState();
-            refreshAllDashboardViews();
-            closeCloudModal();
-            showToast('Sauvegarde .JSON importée et enregistrée !');
-          } else {
-            showToast('Format de fichier JSON non reconnu.');
-          }
-        } catch (err) {
-          showToast('Erreur de lecture du fichier JSON.');
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function openResetDataModal() {
-      document.getElementById('resetDataModal').classList.remove('hidden');
-      document.getElementById('resetDataModal').classList.add('flex');
-    }
-
-    function closeResetDataModal() {
-      document.getElementById('resetDataModal').classList.add('hidden');
-      document.getElementById('resetDataModal').classList.remove('flex');
-    }
-
-    function confirmResetData() {
-      appState = getDefaultState();
-      initOrSyncSessionDraft(true);
-      saveState();
-      refreshAllDashboardViews();
-      closeResetDataModal();
-      closeCloudModal();
-      showToast('Données d’exemple restaurées.');
-    }
-
-    // CHRONOMÈTRE DOUBLE MODE : REPOS (DÉCOMPTE) & MAINTIEN (MONTANT)
-    let timerMode = 'rest';
-    let timerSeconds = 90;
-    let holdSeconds = 0;
-    let timerInterval = null;
-
+    // DUAL TIMER (REST + HOLD STOPWATCH)
     function formatTimer(sec) {
       const m = String(Math.floor(sec / 60)).padStart(2, '0');
       const s = String(sec % 60).padStart(2, '0');
       return `${m}:${s}`;
     }
 
-    function setTimerMode(mode) {
+    function switchTimerMode() {
       clearInterval(timerInterval);
       timerInterval = null;
-      timerMode = mode;
+      timerMode = timerMode === 'rest' ? 'hold' : 'rest';
+      const modeBtn = document.getElementById('timerModeBtn');
+      const presets = document.getElementById('restPresets');
+      const sendBtn = document.getElementById('sendHoldToMaxBtn');
+      document.getElementById('timerStartBtn').textContent = 'Go';
 
-      const btnRest = document.getElementById('modeRestBtn');
-      const btnHold = document.getElementById('modeHoldBtn');
-      const restBox = document.getElementById('restPresetsBox');
-      const holdBox = document.getElementById('holdActionsBox');
-      const startBtn = document.getElementById('timerStartBtn');
-
-      startBtn.textContent = 'Go';
-
-      if (mode === 'rest') {
-        btnRest.className = 'px-2 py-1 rounded-md text-[10px] font-bold bg-orange-500 text-white transition';
-        btnHold.className = 'px-2 py-1 rounded-md text-[10px] font-bold text-slate-400 hover:text-white transition';
-        restBox.classList.remove('hidden');
-        restBox.classList.add('flex');
-        holdBox.classList.add('hidden');
-        holdBox.classList.remove('flex');
-        document.getElementById('timerDisplay').textContent = formatTimer(timerSeconds);
+      if (timerMode === 'rest') {
+        timerSeconds = 90;
+        modeBtn.textContent = 'Repos';
+        modeBtn.className = 'text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-orange-500/20 text-orange-400';
+        presets.classList.remove('hidden');
+        sendBtn.classList.add('hidden');
       } else {
-        btnHold.className = 'px-2 py-1 rounded-md text-[10px] font-bold bg-purple-600 text-white transition';
-        btnRest.className = 'px-2 py-1 rounded-md text-[10px] font-bold text-slate-400 hover:text-white transition';
-        restBox.classList.add('hidden');
-        restBox.classList.remove('flex');
-        holdBox.classList.remove('hidden');
-        holdBox.classList.add('flex');
-        document.getElementById('timerDisplay').textContent = formatTimer(holdSeconds);
+        timerSeconds = 0;
+        modeBtn.textContent = 'Maintien';
+        modeBtn.className = 'text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-purple-500/20 text-purple-300';
+        presets.classList.add('hidden');
+        sendBtn.classList.remove('hidden');
       }
+      document.getElementById('timerDisplay').textContent = formatTimer(timerSeconds);
     }
 
     function setPresetTimer(sec) {
@@ -2556,21 +1586,12 @@
       document.getElementById('timerStartBtn').textContent = 'Go';
     }
 
-    function resetStopwatch() {
+    function resetTimer() {
       clearInterval(timerInterval);
       timerInterval = null;
-      holdSeconds = 0;
-      document.getElementById('timerDisplay').textContent = formatTimer(holdSeconds);
+      timerSeconds = timerMode === 'rest' ? 90 : 0;
+      document.getElementById('timerDisplay').textContent = formatTimer(timerSeconds);
       document.getElementById('timerStartBtn').textContent = 'Go';
-    }
-
-    function useStopwatchInMax() {
-      const val = Math.max(1, holdSeconds);
-      switchMainTab('max');
-      document.getElementById('maxTypeSelect').value = 'hold';
-      handleMaxTypeChange();
-      document.getElementById('maxScoreInput').value = val;
-      showToast(`Temps de maintien (${val} sec) envoyé dans l'onglet 3. Entrer un Max !`);
     }
 
     function toggleTimer() {
@@ -2590,25 +1611,160 @@
               clearInterval(timerInterval);
               timerInterval = null;
               btn.textContent = 'Go';
-              showToast('Temps de repos terminé ! Prêt pour la série suivante.');
+              showToast('Repos terminé ! Place à la série suivante.');
               timerSeconds = 90;
               document.getElementById('timerDisplay').textContent = formatTimer(timerSeconds);
             }
           } else {
-            holdSeconds++;
-            document.getElementById('timerDisplay').textContent = formatTimer(holdSeconds);
+            timerSeconds++;
+            document.getElementById('timerDisplay').textContent = formatTimer(timerSeconds);
           }
         }, 1000);
       }
     }
 
-    function showToast(msg) {
-      const toast = document.getElementById('toastNotification');
-      document.getElementById('toastText').textContent = msg;
-      toast.classList.remove('translate-y-20', 'opacity-0');
-      setTimeout(() => {
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3200);
+    function sendStopwatchToMax() {
+      switchMainTab('max');
+      document.getElementById('maxValueInput').value = Math.max(1, timerSeconds);
+      document.getElementById('maxUnitSelect').value = 'sec';
+      showToast(`Temps de maintien (${timerSeconds}s) envoyé dans le formulaire de Max !`);
+    }
+
+    // SYNC PC ↔ PHONE (COPY-PASTE CODE + FIREBASE CLOUD + JSON)
+    function openSyncModal() {
+      const cfg = getCloudConfig();
+      document.getElementById('cloudEndpointInput').value = cfg.endpoint || '';
+      document.getElementById('cloudUserKeyInput').value = cfg.userKey || 'mathis_sw';
+      document.getElementById('syncModal').classList.remove('hidden');
+      document.getElementById('syncModal').classList.add('flex');
+    }
+
+    function closeSyncModal() {
+      document.getElementById('syncModal').classList.add('hidden');
+      document.getElementById('syncModal').classList.remove('flex');
+    }
+
+    function copySyncCode() {
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(appState))));
+      document.getElementById('syncCodeInput').value = encoded;
+      navigator.clipboard.writeText(encoded);
+      document.getElementById('cloudFeedbackMsg').textContent = '✓ Code copié ! Envoie-le sur ton téléphone et colle-le pour tout récupérer.';
+      showToast('Code de sauvegarde copié dans le presse-papiers !');
+    }
+
+    function restoreFromSyncCode() {
+      const raw = document.getElementById('syncCodeInput').value.trim();
+      if (!raw) {
+        alert('Colle d’abord ton code de sauvegarde dans le champ.');
+        return;
+      }
+      try {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(raw))));
+        if (decoded && Array.isArray(decoded.routines)) {
+          appState = normalizeState(decoded);
+          initSessionDraftFromRoutine(false);
+          saveStateImmediate();
+          refreshAllDashboardViews();
+          closeSyncModal();
+          showToast('Toutes tes routines et séances ont été restaurées !');
+        }
+      } catch (e) {
+        alert('Code de sauvegarde invalide ou incomplet.');
+      }
+    }
+
+    function getCloudConfig() {
+      try {
+        const raw = localStorage.getItem(CLOUD_CONFIG_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return { endpoint: '', userKey: 'mathis_sw' };
+    }
+
+    function saveCloudConfig() {
+      const endpoint = document.getElementById('cloudEndpointInput').value.trim().replace(/\/+$/, '');
+      const userKey = (document.getElementById('cloudUserKeyInput').value.trim() || 'mathis_sw').replace(/[^a-zA-Z0-9_-]/g, '');
+      const cfg = { endpoint, userKey };
+      localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cfg));
+      return cfg;
+    }
+
+    async function pushToCloud(verbose = true) {
+      const cfg = saveCloudConfig();
+      const msg = document.getElementById('cloudFeedbackMsg');
+      if (!cfg.endpoint) return;
+      try {
+        const url = cfg.endpoint.endsWith('.json') ? cfg.endpoint : `${cfg.endpoint}/calisthenics/${cfg.userKey}.json`;
+        const res = await fetch(url, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ updatedAt: new Date().toISOString(), state: appState })
+        });
+        if (!res.ok) throw new Error();
+        if (verbose && msg) msg.textContent = '✓ Synchronisé dans le Cloud Firebase !';
+      } catch (e) {
+        if (verbose && msg) msg.textContent = 'Erreur Cloud : vérifie ton URL Firebase.';
+      }
+    }
+
+    async function pullFromCloud(verbose = true) {
+      const cfg = saveCloudConfig();
+      const msg = document.getElementById('cloudFeedbackMsg');
+      if (!cfg.endpoint) return;
+      try {
+        const url = cfg.endpoint.endsWith('.json') ? cfg.endpoint : `${cfg.endpoint}/calisthenics/${cfg.userKey}.json`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && data.state && Array.isArray(data.state.routines)) {
+          appState = normalizeState(data.state);
+          initSessionDraftFromRoutine(false);
+          saveStateImmediate();
+          refreshAllDashboardViews();
+          if (verbose && msg) msg.textContent = '✓ Données récupérées depuis le Cloud !';
+          showToast('Synchronisé depuis le Cloud !');
+        }
+      } catch (e) {
+        if (verbose && msg) msg.textContent = 'Impossible de charger depuis le Cloud.';
+      }
+    }
+
+    function exportDataJson() {
+      const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `calisthenics_pro_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importDataJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && Array.isArray(parsed.routines)) {
+            appState = normalizeState(parsed);
+            initSessionDraftFromRoutine(false);
+            saveStateImmediate();
+            refreshAllDashboardViews();
+            closeSyncModal();
+            showToast('Fichier .JSON importé avec succès !');
+          }
+        } catch (err) {
+          alert('Fichier JSON invalide.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function showToast(text) {
+      const t = document.getElementById('toastNotification');
+      document.getElementById('toastText').textContent = text;
+      t.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 3200);
     }
 
     function refreshAllDashboardViews() {
@@ -2623,18 +1779,13 @@
       lucide.createIcons();
     }
 
-    // INITIALISATION AU CHARGEMENT
     window.addEventListener('DOMContentLoaded', () => {
       const today = new Date().toISOString().slice(0, 10);
-      populateStaticExerciseDropdowns();
-      initOrSyncSessionDraft(false);
-
-      document.getElementById('sessionDateInput').value = appState.draftSession?.date || today;
-      document.getElementById('sessionNoteInput').value = appState.draftSession?.note || '';
+      document.getElementById('sessionDateInput').value = today;
       document.getElementById('maxDateInput').value = today;
-
+      populateExerciseSelects();
+      initSessionDraftFromRoutine(false);
       refreshAllDashboardViews();
-      saveState(true);
     });
   </script>
 </body>
